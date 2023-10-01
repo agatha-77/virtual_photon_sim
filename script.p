@@ -1,0 +1,27 @@
+
+set style line 1 lt 3 lw 2 pt 2
+#set term epslatex color colortext size 3,2.5 
+#set output 'figs/N_gamma-electron.tex'
+
+set grid
+set key top right
+set key box
+set key height 1
+set key width 1
+
+unset key
+
+#set xtics 0e-15, 2e-15, 10e-15
+
+set xlabel font ",10"
+set ylabel font ",10"
+set ylabel "n ({/Symbol w})"
+set xlabel '{/Symbol w}[eV]'
+
+
+plot 'data/n_total.dat' using 1:2 with lines lw 2 linecolor 7 
+
+#plot 'data/ratio_N.dat' using 1:2 with lines lw 2 linecolor 7 dt 1, 'data/ratio_N.dat' using 1:3 w l lw 2 linecolor 8 dt 2
+
+pause -1
+

@@ -1,0 +1,13 @@
+
+set pm3d map
+set logscale zcb 10
+unset key
+
+set title 'N({/Symbol w},b)'
+
+set xlabel "{/Symbol w}[eV]"
+set ylabel "b [m]"
+
+splot 'data/N2_map.dat'
+
+pause -1
