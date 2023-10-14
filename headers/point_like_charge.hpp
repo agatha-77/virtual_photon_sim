@@ -6,7 +6,9 @@
  * de carga.
  *
  * Aqui, estamos usando unidades SI (MKSA) ao invés das naturais,
- * uma vez que são estas as disponíveis na biblioteca GSL.
+ * uma vez que são estas as disponíveis na biblioteca GSL. As funções aqui
+ * definidas são feitas de forma direta, uma vez que os cálculos para tais é
+ * solúvel analiticamente.
  */
 
 #include<cmath>
@@ -31,6 +33,7 @@ double K1(double b_ARG)
 	return gsl_sf_bessel_K0(b_ARG);
 }
 
+// Argumento da função de Bessel 
 double bess_arg(double frequency, double imp_par)
 {
 	double vel = sqrt(2 * ELECTRON_MASS * frequency);

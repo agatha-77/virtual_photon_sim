@@ -63,6 +63,7 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 	log_out.close();
 }
 
+// Printa a razão entre o N1 e o N2 para uma escolha da frequencia
 void output_ratio(const char FNAME[50])
 {
 	const int NUM_PONTOS = 500;
@@ -87,9 +88,10 @@ void output_ratio(const char FNAME[50])
 	dados_out.close();
 }
 
+// Faz o output do número de fótons totais integrados sobre o parâmetro de
+// impacto
 void output_n_total(const char FNAME[50])
 {
-	// Número de pontos do gráfico
 	const int NUM_PONTOS = 100;
 
 	// Intervalos de frequencia em eletron-Volt
@@ -113,16 +115,15 @@ void output_n_total(const char FNAME[50])
 
 int main(int argc, char *argv[])
 {
-	std::cout << "\n";
 	std::cout << "-----------------------------------\n";
-	std::cout << "-> Iniciando cálculo dos pontos.\n";
+	std::cout << " Iniciando cálculo dos pontos.\n";
 
 	output_N1_and_N2("data/N1_map.dat","data/N2_map.dat");
 	output_ratio("data/ratio.dat");
 	output_n_total("data/n_total.dat");
 
-	std::cout << "\nCálculo concluído\n\n";
-	std::cout << "Dados postos nos arquivos.\n";
+	std::cout << "\n Cálculo concluído\n\n";
+	std::cout << " Dados postos nos arquivos.\n";
 
 	return 0;
 }
