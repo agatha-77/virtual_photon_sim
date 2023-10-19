@@ -5,17 +5,12 @@
 #include"headers/phys_const.hpp"
 
 double vel_f(double freq){
-	// Comprimento de onda de COMPTON
-	//double wavelength = 2 * PI * PLANCK_REDU * freq / (ELECTRON_MASS *
-		//	LIGHT_VEL);
 	// Comprimento de onda de DE BROGLIE
-	//double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq +
-	//			2*freq*ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL));
-	
-	// Puramente relativístico
-	double vel = 1/(LIGHT_VEL*LIGHT_VEL) - ELECTRON_MASS*ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL*
-		(freq*freq + ELECTRON_MASS*ELECTRON_MASS * pow(4,LIGHT_VEL));
+	double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq +
+				2*freq*ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL));
 
+	double vel = wavelength*freq;
+	
 	return vel;
 }
 
@@ -28,8 +23,8 @@ double bess_arg(double frequency, double imp_par){
 }
 
 int main(int argc, char *argv[]){
-	const double FREQ_MIN = 1.0;
-	const double FREQ_MAX = 10.0; 
+	const double FREQ_MIN = 1.0*GSL_CONST_NUM_MEGA;
+	const double FREQ_MAX = 10.0*GSL_CONST_NUM_MEGA; 
 
 	const double B_MIN = 1.0;
 	const double B_MAX = 10.0;

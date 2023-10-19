@@ -33,10 +33,20 @@ double K1(double b_ARG)
 	return gsl_sf_bessel_K0(b_ARG);
 }
 
+// Função de velocidade em termos da frequencia
+double vel_f(double freq){
+	// Comprimento de onda de DE BROGLIE
+	double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq + 2 * freq *
+				ELECTRON_MASS * LIGHT_VEL * LIGHT_VEL));
+	double vel = wavelength*freq;
+	
+	return vel;
+}
+
 // Argumento da função de Bessel 
 double bess_arg(double frequency, double imp_par)
 {
-	double vel = sqrt(2 * ELECTRON_MASS * frequency);
+	double vel = vel_f(frequency);
 	double beta = vel / LIGHT_VEL;
 	double gamma = 1.0/sqrt( 1.0 - (beta*beta) );
 
@@ -47,7 +57,7 @@ double bess_arg(double frequency, double imp_par)
 // N(w,b) do pulso paralelo P1
 double ep_num_par(double frequency, double imp_par)
 {
-	double vel = sqrt(2 * ELECTRON_MASS * frequency);
+	double vel = vel_f(frequency);
 	double beta = vel / LIGHT_VEL;
 	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
 	double bessel_arg = bess_arg(frequency, imp_par);
@@ -60,7 +70,7 @@ double ep_num_par(double frequency, double imp_par)
 // N(w,b) do pulso perpendicular P2
 double ep_num_perp(double frequency, double imp_par)
 {
-	double vel = sqrt(2 * ELECTRON_MASS * frequency);
+	double vel = vel_f(frequency);
 	double beta = vel / LIGHT_VEL;
 	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
 	double bessel_arg = bess_arg(frequency, imp_par);
@@ -75,7 +85,7 @@ double ep_num_total(double frequency)
 {
 	const double IMP_PAR_MIN = GSL_CONST_MKSA_BOHR_RADIUS;
 
-	double vel = sqrt(2 * ELECTRON_MASS * frequency);
+	double vel = vel_f(frequency);
 	double beta = vel / LIGHT_VEL;
 	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
 	double bessel_arg = bess_arg(frequency, IMP_PAR_MIN);
@@ -84,9 +94,7 @@ double ep_num_total(double frequency)
 			PLANCK_REDU);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
-			pow(beta,2) * ( pow(K1(bessel_arg),2 ) - pow( K0(bessel_arg),2) ) /
-			2);
-
+			pow(beta,2) * ( pow(K1(bessel_arg),2 ) - pow( K0(bessel_arg),2) ) / 2);
 }
 
 #endif
