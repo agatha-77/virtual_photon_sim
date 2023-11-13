@@ -22,16 +22,16 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 {
 	const int NUM_PONTOS = 100;
 
-	const double LOWER_B = 0.5e-16;
-	const double UPPER_B = 50e-15;
+	const long double LOWER_B = 0.5e-16;
+	const long double UPPER_B = 50e-15;
 
-	const double LOWER_F = 0.1e+9;
-	const double UPPER_F = 50.0e+9;
+	const long double LOWER_F = 0.1e+9;
+	const long double UPPER_F = 50.0e+9;
 
-	double b = LOWER_B;
-	double freq = LOWER_F;
-	double step_par = (UPPER_B - LOWER_B)/NUM_PONTOS;
-	double step_freq = (UPPER_F - LOWER_F)/NUM_PONTOS;
+	long double b = LOWER_B;
+	long double freq = LOWER_F;
+	long double step_par = (UPPER_B - LOWER_B)/NUM_PONTOS;
+	long double step_freq = (UPPER_F - LOWER_F)/NUM_PONTOS;
 
 	std::ofstream dados_out1(FNAME_N1);
 	std::ofstream dados_out2(FNAME_N2);
@@ -72,17 +72,17 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 void output_ratio(const char FNAME[50])
 {
 	const int NUM_PONTOS = 500;
-	const double LOWER_B = 0.5e-16;
-	const double UPPER_B = 50.0e-14;
-	const double STEP = (UPPER_B - LOWER_B) / NUM_PONTOS;
-	const double FREQ1 = 1.0e+9;
-	const double FREQ2 = 10.0e+9;
+	const long double LOWER_B = 0.5e-16;
+	const long double UPPER_B = 50.0e-14;
+	const long double STEP = (UPPER_B - LOWER_B) / NUM_PONTOS;
+	const long double FREQ1 = 1.0e+9;
+	const long double FREQ2 = 10.0e+9;
 
 	std::ofstream dados_out(FNAME);
 	assert(dados_out.is_open());
 
-	double b = LOWER_B;
-	double ratio1, ratio2;
+	long double b = LOWER_B;
+	long double ratio1, ratio2;
 
 	std::cout << "\n * Parâmetros da curva N1/N2 \n";
 	std::cout << "\tIntervalo de parâmetro de impacto:";
@@ -109,11 +109,11 @@ void output_n_total(const char FNAME[50])
 	const int NUM_PONTOS = 500;
 
 	// Intervalos de frequencia em eletron-Volt
-	const double LOWER_F = 1.0e+9;
-	const double UPPER_F = 50.0e+9; 
+	const long double LOWER_F = 1.0e+9;
+	const long double UPPER_F = 50.0e+9; 
 
-	double freq = LOWER_F;
-	double step = (UPPER_F - LOWER_F)/NUM_PONTOS;
+	long double freq = LOWER_F;
+	long double step = (UPPER_F - LOWER_F)/NUM_PONTOS;
 
 	std::ofstream dados_out(FNAME);
 	assert(dados_out.is_open());

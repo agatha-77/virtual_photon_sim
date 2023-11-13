@@ -23,27 +23,27 @@
 #include"phys_const.hpp" 
 
 // Funções de Bessel resumidas para deixar mais legível o resto do codigo
-double K0(double b_ARG)
+long double K0(long double b_ARG)
 {
 	return gsl_sf_bessel_K0(b_ARG);
 }
 
-double K1(double b_ARG)
+long double K1(long double b_ARG)
 {
 	return gsl_sf_bessel_K1(b_ARG);
 }
 
 // Função de velocidade em termos da frequencia assumindo comportamento ondulatório
 // da partícula. 
-double vel_f(double freq){
+long double vel_f(long double freq){
 	// Comprimento de onda de DE BROGLIE
-	double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq + 2 * freq *
+	long double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq + 2 * freq *
 				ELECTRON_MASS * LIGHT_VEL * LIGHT_VEL));
-	double vel = wavelength*freq;
+	long double vel = wavelength*freq;
 	
 	// Velocidade relativística
 	/*
-	double vel = (1/LIGHT_VEL * LIGHT_VEL) - ELECTRON_MASS * ELECTRON_MASS *
+	long double vel = (1/LIGHT_VEL * LIGHT_VEL) - ELECTRON_MASS * ELECTRON_MASS *
 		LIGHT_VEL*LIGHT_VEL * (freq*freq + (ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL) *
 				(ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL));
 	*/
@@ -52,23 +52,23 @@ double vel_f(double freq){
 }
 
 // Argumento da função de Bessel 
-double bess_arg(double frequency, double imp_par)
+long double bess_arg(long double frequency, long double imp_par)
 {
-	double vel = vel_f(frequency);
-	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - (beta*beta) );
+	long double vel = vel_f(frequency);
+	long double beta = vel / LIGHT_VEL;
+	long double gamma = 1.0/sqrt( 1.0 - (beta*beta) );
 
 	return ( frequency * imp_par )/(gamma * vel); 
 }
 
 
 // N(w,b) do pulso paralelo P1
-double ep_num_par(double frequency, double imp_par)
+long double ep_num_par(long double frequency, long double imp_par)
 {
-	double vel = vel_f(frequency);
-	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - beta*beta );
-	double bessel_arg = bess_arg(frequency, imp_par);
+	long double vel = vel_f(frequency);
+	long double beta = vel / LIGHT_VEL;
+	long double gamma = 1.0/sqrt( 1.0 - beta*beta );
+	long double bessel_arg = bess_arg(frequency, imp_par);
 
 	return ION_CHARGE * bessel_arg*bessel_arg * K0(bessel_arg)*K0(bessel_arg) / ( PI*PI
 			* beta*beta * frequency * imp_par*imp_par * gamma*gamma * PLANCK_REDU);
@@ -76,12 +76,12 @@ double ep_num_par(double frequency, double imp_par)
 
 
 // N(w,b) do pulso perpendicular P2
-double ep_num_perp(double frequency, double imp_par)
+long double ep_num_perp(long double frequency, long double imp_par)
 {
-	double vel = vel_f(frequency);
-	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
-	double bessel_arg = bess_arg(frequency, imp_par);
+	long double vel = vel_f(frequency);
+	long double beta = vel / LIGHT_VEL;
+	long double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
+	long double bessel_arg = bess_arg(frequency, imp_par);
 
 	return ION_CHARGE * bessel_arg*bessel_arg * K1(bessel_arg)*K1(bessel_arg) / ( PI*PI
 			* beta*beta * frequency * imp_par*imp_par * PLANCK_REDU );
@@ -89,16 +89,16 @@ double ep_num_perp(double frequency, double imp_par)
 
 
 // Numero total de fotons equivalentes integrado sobre os parametros de impacto
-double ep_num_total(double frequency)
+long double ep_num_total(long double frequency)
 {
-	const double IMP_PAR_MIN = GSL_CONST_MKSA_BOHR_RADIUS;
+	const long double IMP_PAR_MIN = GSL_CONST_MKSA_BOHR_RADIUS;
 
-	double vel = vel_f(frequency);
-	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
-	double bessel_arg = bess_arg(frequency, IMP_PAR_MIN);
+	long double vel = vel_f(frequency);
+	long double beta = vel / LIGHT_VEL;
+	long double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
+	long double bessel_arg = bess_arg(frequency, IMP_PAR_MIN);
 
-	double frontal_mult = 2 * ION_CHARGE / (PI*LIGHT_VEL*pow(beta,2) *
+	long double frontal_mult = 2 * ION_CHARGE / (PI*LIGHT_VEL*pow(beta,2) *
 			PLANCK_REDU);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
