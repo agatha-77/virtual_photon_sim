@@ -16,11 +16,8 @@ unset key
 set xlabel font ",10"
 set ylabel font ",10"
 set ylabel "n ({/Symbol w})"
-set xlabel '{/Symbol w}[eV]'
+set xlabel '{/Symbol w}[GeV]'
 
-
-plot 'data/n_total.dat' using 1:2 with lines lw 2 linecolor 7 
-
+plot 'data/n_total.dat' with lines lw 2 linecolor 7 
 
 pause -1
-

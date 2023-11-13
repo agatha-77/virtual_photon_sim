@@ -26,7 +26,7 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 	const double UPPER_B = 50e-15;
 
 	const double LOWER_F = 0.1e+9;
-	const double UPPER_F = 6.0e+9;
+	const double UPPER_F = 50.0e+9;
 
 	double b = LOWER_B;
 	double freq = LOWER_F;
@@ -40,17 +40,21 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 	assert(dados_out2.is_open());
 
 	std::cout << "\n * Parâmetros dos mapas bidimensionais de N1 e N2 \n";
-	std::cout << "\tIntervalo de parâmetro de impacto:\t[" << LOWER_B << ":" << UPPER_B << "] \n"; 
-	std::cout << "\tIntervalo de frequência:\t\t[" << LOWER_F << ":" << UPPER_F << "] \n";
+	std::cout << "\tIntervalo de parâmetro de impacto:";
+	std::cout << "[" << LOWER_B << ":" << UPPER_B << "] [m] \n"; 
+	std::cout << "\tIntervalo de frequência: [" << LOWER_F << ":" << UPPER_F << "] [eV]\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS*NUM_PONTOS << "\n";
-	std::cout << "\tDados salvos nos arquivos \'" << FNAME_N1 << "\' e \'" << FNAME_N2 << "\'\n";
+	std::cout << "\tDados salvos nos arquivos";
+	std::cout << "\'" << FNAME_N1 << "\' e \'" << FNAME_N2 << "\'\n";
 
 	for(int i = 0; i <= NUM_PONTOS; i++){
 		b = LOWER_B;
 
 		for(int k = 0; k <= NUM_PONTOS; k++){
-			dados_out1 << freq << "\t" << b << "\t" << ep_num_par(freq,b) << "\n";
-			dados_out2 << freq << "\t" << b << "\t" << ep_num_perp(freq,b) << "\n";
+			dados_out1 << freq / GSL_CONST_NUM_GIGA << "\t" << b /
+				GSL_CONST_NUM_FEMTO << "\t" << ep_num_par(freq,b) << "\n";
+			dados_out2 << freq / GSL_CONST_NUM_GIGA << "\t" << b /
+				GSL_CONST_NUM_FEMTO<< "\t" << ep_num_perp(freq,b) << "\n";
 
 			b += step_par;
 		}
@@ -67,30 +71,33 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 // Printa a razão entre o N1 e o N2 para uma escolha da frequencia
 void output_ratio(const char FNAME[50])
 {
-	const int NUM_PONTOS = 1000;
+	const int NUM_PONTOS = 500;
 	const double LOWER_B = 0.5e-16;
 	const double UPPER_B = 50.0e-14;
 	const double STEP = (UPPER_B - LOWER_B) / NUM_PONTOS;
-	const double FREQ = 10.0e+9;
+	const double FREQ1 = 1.0e+9;
+	const double FREQ2 = 10.0e+9;
 
 	std::ofstream dados_out(FNAME);
 	assert(dados_out.is_open());
 
 	double b = LOWER_B;
-	double ratio;
+	double ratio1, ratio2;
 
 	std::cout << "\n * Parâmetros da curva N1/N2 \n";
-	std::cout << "\tIntervalo de parâmetro de impacto:\t[" << LOWER_B << ":" << UPPER_B << "]\n";
-	std::cout << "\tFrequência utilizada = " << FREQ << "\n";
+	std::cout << "\tIntervalo de parâmetro de impacto:";
+	std::cout <<" [" << LOWER_B << ":" << UPPER_B << "] [m]\n";
+	std::cout << "\tFrequências utilizadas = " << FREQ1 << " eV e " << FREQ2 << " eV\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS << "\n";
 
 	for(int i = 0; i <= NUM_PONTOS; i++){
-		ratio = ep_num_par(FREQ,b) / ep_num_perp(FREQ,b);
-		dados_out << b << "\t" << ratio << "\n";
+		ratio1 = ep_num_par(FREQ1,b) / ep_num_perp(FREQ1,b);
+		ratio2 = ep_num_par(FREQ2,b) / ep_num_perp(FREQ2,b);
+		dados_out << b << "\t" << ratio1 << "\t" << ratio2 << "\n";
 		b += STEP;
 	}
 	
-	std::cout << "\tDados salvos no arquivo \'" << FNAME << "\'\n";
+	std::cout << "\t-> Dados salvos no arquivo \'" << FNAME << "\'\n";
 
 	dados_out.close();
 }
@@ -99,7 +106,7 @@ void output_ratio(const char FNAME[50])
 // impacto
 void output_n_total(const char FNAME[50])
 {
-	const int NUM_PONTOS = 5000;
+	const int NUM_PONTOS = 500;
 
 	// Intervalos de frequencia em eletron-Volt
 	const double LOWER_F = 1.0e+9;
@@ -112,13 +119,13 @@ void output_n_total(const char FNAME[50])
 	assert(dados_out.is_open());
 	
 	std::cout << "\n * Parâmetros da curva n \n";
-	std::cout << "\tIntervalo de frequência:\t[" << LOWER_F << ":" << UPPER_F << "]\n";
-	std::cout << "\tParâmetro de impacto mínimo = " << GSL_CONST_MKSA_BOHR_RADIUS << "\n";
+	std::cout << "\tIntervalo de frequência: [" << LOWER_F << ":" << UPPER_F << "] [eV]\n";
+	std::cout << "\tParâmetro de impacto mínimo = " << GSL_CONST_MKSA_BOHR_RADIUS << " m\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS << "\n";
 	std::cout << "\tDados salvos no arquivo \'" << FNAME << "\'\n";
 
 	for(int i = 0; i <= NUM_PONTOS; i++){
-		dados_out << freq << "\t" << ep_num_total(freq) << "\n";
+		dados_out << freq / GSL_CONST_NUM_GIGA << "\t" << ep_num_total(freq) << "\n";
 		freq += step;
 	}
 
@@ -128,7 +135,6 @@ void output_n_total(const char FNAME[50])
 
 int main(int argc, char *argv[])
 {
-	std::cout << "-----------------------------------\n";
 	std::cout << "Iniciando cálculo dos pontos.\n";
 
 	output_N1_and_N2("data/N1_map.dat","data/N2_map.dat");

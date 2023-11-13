@@ -1,11 +1,16 @@
 set pm3d map
 set logscale zcb 
 unset key
+set lmargin 5
 
 set title "N_1({/Symbol w},b)"
 
-set xlabel "{/Symbol w}[eV]"
-set ylabel "b [m]"
+#set ytics rotate by 45 right
+
+set xlabel font ",10"
+set ylabel font ",10"
+set xlabel "{/Symbol w}[GeV]"
+set ylabel "b [fm]"
 
 splot 'data/N1_map.dat' 
 

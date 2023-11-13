@@ -30,16 +30,24 @@ double K0(double b_ARG)
 
 double K1(double b_ARG)
 {
-	return gsl_sf_bessel_K0(b_ARG);
+	return gsl_sf_bessel_K1(b_ARG);
 }
 
-// Função de velocidade em termos da frequencia
+// Função de velocidade em termos da frequencia assumindo comportamento ondulatório
+// da partícula. 
 double vel_f(double freq){
 	// Comprimento de onda de DE BROGLIE
 	double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq + 2 * freq *
 				ELECTRON_MASS * LIGHT_VEL * LIGHT_VEL));
 	double vel = wavelength*freq;
 	
+	// Velocidade relativística
+	/*
+	double vel = (1/LIGHT_VEL * LIGHT_VEL) - ELECTRON_MASS * ELECTRON_MASS *
+		LIGHT_VEL*LIGHT_VEL * (freq*freq + (ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL) *
+				(ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL));
+	*/
+
 	return vel;
 }
 
@@ -59,11 +67,11 @@ double ep_num_par(double frequency, double imp_par)
 {
 	double vel = vel_f(frequency);
 	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
+	double gamma = 1.0/sqrt( 1.0 - beta*beta );
 	double bessel_arg = bess_arg(frequency, imp_par);
 
-	return ION_CHARGE * pow(bessel_arg,2) * pow(K0(bessel_arg),2) / ( pow(PI,2)
-			* pow(beta,2) * frequency * pow(imp_par,2) * pow(gamma,2) * PLANCK_REDU);
+	return ION_CHARGE * bessel_arg*bessel_arg * K0(bessel_arg)*K0(bessel_arg) / ( PI*PI
+			* beta*beta * frequency * imp_par*imp_par * gamma*gamma * PLANCK_REDU);
 }
 
 
@@ -75,8 +83,8 @@ double ep_num_perp(double frequency, double imp_par)
 	double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
 	double bessel_arg = bess_arg(frequency, imp_par);
 
-	return ION_CHARGE * pow(bessel_arg,2) * pow(K1(bessel_arg),2) / ( pow(PI,2)
-			* pow(beta,2) * frequency * pow(imp_par,2) * PLANCK_REDU );
+	return ION_CHARGE * bessel_arg*bessel_arg * K1(bessel_arg)*K1(bessel_arg) / ( PI*PI
+			* beta*beta * frequency * imp_par*imp_par * PLANCK_REDU );
 }
 
 
