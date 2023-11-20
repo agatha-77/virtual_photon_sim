@@ -98,11 +98,11 @@ long double ep_num_total(long double frequency)
 	long double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
 	long double bessel_arg = bess_arg(frequency, IMP_PAR_MIN);
 
-	long double frontal_mult = 2 * ION_CHARGE / (PI*LIGHT_VEL*pow(beta,2) *
+	long double frontal_mult = 2 * ION_CHARGE / (PI*LIGHT_VEL*(beta*beta) *
 			PLANCK_REDU);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
-			pow(beta,2) * ( pow(K1(bessel_arg),2 ) - pow( K0(bessel_arg),2) ) / 2);
+			(beta*beta) * ( K1(bessel_arg)*K1(bessel_arg) - K0(bessel_arg)*K0(bessel_arg) ) / 2);
 }
 
 #endif

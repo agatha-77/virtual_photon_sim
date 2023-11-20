@@ -41,8 +41,10 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 
 	std::cout << "\n * Parâmetros dos mapas bidimensionais de N1 e N2 \n";
 	std::cout << "\tIntervalo de parâmetro de impacto:";
-	std::cout << "[" << LOWER_B << ":" << UPPER_B << "] [m] \n"; 
-	std::cout << "\tIntervalo de frequência: [" << LOWER_F << ":" << UPPER_F << "] [eV]\n";
+	std::cout << "[" << LOWER_B / GSL_CONST_NUM_FEMTO << " fm e " << UPPER_B /
+		GSL_CONST_NUM_FEMTO << " fm\n"; 
+	std::cout << "\tIntervalo de frequência: " << LOWER_F / GSL_CONST_NUM_GIGA
+		<< " GeV e " << UPPER_F / GSL_CONST_NUM GIGA << " GeV\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS*NUM_PONTOS << "\n";
 	std::cout << "\tDados salvos nos arquivos";
 	std::cout << "\'" << FNAME_N1 << "\' e \'" << FNAME_N2 << "\'\n";
@@ -85,15 +87,16 @@ void output_ratio(const char FNAME[50])
 	long double ratio1, ratio2;
 
 	std::cout << "\n * Parâmetros da curva N1/N2 \n";
-	std::cout << "\tIntervalo de parâmetro de impacto:";
-	std::cout <<" [" << LOWER_B << ":" << UPPER_B << "] [m]\n";
-	std::cout << "\tFrequências utilizadas = " << FREQ1 << " eV e " << FREQ2 << " eV\n";
+	std::cout << "\tIntervalo de parâmetro de impacto: ";
+	std::cout << LOWER_B / GSL_CONST_NUM_FEMTO << " fm e " << UPPER_B / GSL_CONST_NUM_FEMTO << " fm \n";
+	std::cout << "\tFrequências utilizadas: " << FREQ1 / GSL_CONST_NUM_GIGA << " GeV e ";
+	std::cout << FREQ2 / GSL_CONST_NUM_GIGA << " GeV\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS << "\n";
 
 	for(int i = 0; i <= NUM_PONTOS; i++){
 		ratio1 = ep_num_par(FREQ1,b) / ep_num_perp(FREQ1,b);
 		ratio2 = ep_num_par(FREQ2,b) / ep_num_perp(FREQ2,b);
-		dados_out << b << "\t" << ratio1 << "\t" << ratio2 << "\n";
+		dados_out << b / GSL_CONST_NUM_FEMTO << "\t" << ratio1 << "\t" << ratio2 << "\n";
 		b += STEP;
 	}
 	
@@ -110,7 +113,7 @@ void output_n_total(const char FNAME[50])
 
 	// Intervalos de frequencia em eletron-Volt
 	const long double LOWER_F = 1.0e+9;
-	const long double UPPER_F = 50.0e+9; 
+	const long double UPPER_F = 20.0e+9; 
 
 	long double freq = LOWER_F;
 	long double step = (UPPER_F - LOWER_F)/NUM_PONTOS;
