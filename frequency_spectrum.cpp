@@ -44,7 +44,7 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 	std::cout << "[" << LOWER_B / GSL_CONST_NUM_FEMTO << " fm e " << UPPER_B /
 		GSL_CONST_NUM_FEMTO << " fm\n"; 
 	std::cout << "\tIntervalo de frequência: " << LOWER_F / GSL_CONST_NUM_GIGA
-		<< " GeV e " << UPPER_F / GSL_CONST_NUM GIGA << " GeV\n";
+		<< " GeV e " << UPPER_F / GSL_CONST_NUM_GIGA << " GeV\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS*NUM_PONTOS << "\n";
 	std::cout << "\tDados salvos nos arquivos";
 	std::cout << "\'" << FNAME_N1 << "\' e \'" << FNAME_N2 << "\'\n";
