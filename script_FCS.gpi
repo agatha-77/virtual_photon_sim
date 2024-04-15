@@ -1,0 +1,21 @@
+
+set grid
+set key top right
+set key box
+set key height 1
+set key width 1
+unset key
+
+set xlabel font ",15"
+set ylabel font ",15"
+set xtics font ",12"
+set ytics font ",12"
+
+set ylabel offset -1
+
+set xlabel "W_{{/Symbol g}{/Symbol g}}[GeV]"
+set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> {/Symbol m}^+ {/Symbol m}^-}[fm]"
+
+plot 'data/fundamental_CS.dat' w lines lw 2 linecolor 8
+
+pause -1
