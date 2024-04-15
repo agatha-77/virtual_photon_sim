@@ -1,7 +1,7 @@
 set pm3d map
 set logscale zcb 100
 unset key
-set lmargin 5
+#set lmargin 5
 
 set title 'N_2({/Symbol w},b)'
 

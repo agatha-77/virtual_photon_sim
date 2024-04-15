@@ -12,8 +12,6 @@
  */
 
 #include<cmath>
-#include<fstream>
-#include<iostream>
 
 // Bibliotecas do GSL que são utilizadas aqui
 #include<gsl/gsl_sf.h>
@@ -70,8 +68,9 @@ long double ep_num_par(long double frequency, long double imp_par)
 	long double gamma = 1.0/sqrt( 1.0 - beta*beta );
 	long double bessel_arg = bess_arg(frequency, imp_par);
 
-	return ION_CHARGE * bessel_arg*bessel_arg * K0(bessel_arg)*K0(bessel_arg) / ( PI*PI
-			* beta*beta * frequency * imp_par*imp_par * gamma*gamma * PLANCK_REDU);
+	return ION_CHARGE * bessel_arg*bessel_arg * K0(bessel_arg)*K0(bessel_arg) /
+		( PI*PI * beta*beta * frequency * imp_par*imp_par * gamma*gamma *
+		  PLANCK_REDU);
 }
 
 
@@ -80,11 +79,11 @@ long double ep_num_perp(long double frequency, long double imp_par)
 {
 	long double vel = vel_f(frequency);
 	long double beta = vel / LIGHT_VEL;
-	long double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
+	long double gamma = 1.0/sqrt( 1.0 - beta*beta );
 	long double bessel_arg = bess_arg(frequency, imp_par);
 
-	return ION_CHARGE * bessel_arg*bessel_arg * K1(bessel_arg)*K1(bessel_arg) / ( PI*PI
-			* beta*beta * frequency * imp_par*imp_par * PLANCK_REDU );
+	return ION_CHARGE * bessel_arg*bessel_arg * K1(bessel_arg)*K1(bessel_arg) /
+		( PI*PI * beta*beta * frequency * imp_par*imp_par * PLANCK_REDU );
 }
 
 
@@ -95,14 +94,15 @@ long double ep_num_total(long double frequency)
 
 	long double vel = vel_f(frequency);
 	long double beta = vel / LIGHT_VEL;
-	long double gamma = 1.0/sqrt( 1.0 - pow(beta,2) );
+	long double gamma = 1.0/sqrt( 1.0 - beta*beta );
 	long double bessel_arg = bess_arg(frequency, IMP_PAR_MIN);
 
 	long double frontal_mult = 2 * ION_CHARGE / (PI*LIGHT_VEL*(beta*beta) *
 			PLANCK_REDU);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
-			(beta*beta) * ( K1(bessel_arg)*K1(bessel_arg) - K0(bessel_arg)*K0(bessel_arg) ) / 2);
+			(beta*beta) * ( K1(bessel_arg)*K1(bessel_arg) -
+				K0(bessel_arg)*K0(bessel_arg) ) / 2);
 }
 
 #endif

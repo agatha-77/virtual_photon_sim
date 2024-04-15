@@ -20,7 +20,7 @@
 // atualização do valor de x.
 void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 {
-	const int NUM_PONTOS = 100;
+	const int NUM_PONTOS = 50;
 
 	const long double LOWER_B = 0.5e-16;
 	const long double UPPER_B = 50e-15;
