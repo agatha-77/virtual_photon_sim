@@ -9,10 +9,8 @@ double vel_f(double freq){
 	double wavelength = LIGHT_VEL / (2 * PI * sqrt(freq*freq +
 				2*freq*ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL));
 
-	// Velocidade relativistica acho
-	double vel = (1/LIGHT_VEL * LIGHT_VEL) - ELECTRON_MASS * ELECTRON_MASS *
-		LIGHT_VEL*LIGHT_VEL * (freq*freq + (ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL) *
-				(ELECTRON_MASS*LIGHT_VEL*LIGHT_VEL));
+	long double vel = 0.001 * LIGHT_VEL;
+
 	return vel;
 }
 
@@ -31,7 +29,7 @@ int main(int argc, char *argv[]){
 	const double B_MIN = 1.0;
 	const double B_MAX = 10.0;
 
-	const int NUM_PONTOS = 4;
+	const int NUM_PONTOS = 5;
 	
 	double freq_step = (FREQ_MAX - FREQ_MIN) / NUM_PONTOS;
 	double b_step = (B_MAX - B_MIN) / NUM_PONTOS;
@@ -44,7 +42,7 @@ int main(int argc, char *argv[]){
 	std::cout << "#\n# Resultados com "; 
 	std::cout << "[b_step = " << b_step << "] ; [freq_step = " << freq_step << "]\n#\n";
 	std::cout << "###\t\tINICIO DOS DADOS\t\t###\n";
-	std::cout << "#freq\tb\tvel\t\tbeta\t\tgamma\tbess_arg\n";
+	std::cout << "#freq\t\t\tb\t\t\tvel\t\t\tbeta\t\t\tgamma\t\t\tbess_arg\n";
 
 	for(int i = 0; i <= NUM_PONTOS; i++){
 		double b = B_MIN;

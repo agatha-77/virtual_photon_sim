@@ -1,4 +1,3 @@
-
 set grid
 set key top right
 set key box
@@ -14,8 +13,8 @@ set ytics font ",12"
 set ylabel offset -1
 
 set xlabel "W_{{/Symbol g}{/Symbol g}}[GeV]"
-set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> {/Symbol m}^+ {/Symbol m}^-}[fm]"
+set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> e^+ e^-}[fm]"
 
-plot 'data/fundamental_CS.dat' w lines lw 2 linecolor 8
+plot 'data/fundamental_electron_CS.dat' using 1:2 w lines lw 2 linecolor 8
 
 pause -1
