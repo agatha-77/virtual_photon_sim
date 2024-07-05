@@ -6,7 +6,6 @@ set logscale y
 
 set lmargin 15
 set rmargin 15
-set grid
 
 set title font 	",15"
 set xlabel font ",15"
@@ -16,7 +15,7 @@ set ytics font 	",11"
 set key font ",12"
 
 set ylabel offset -2
-set xlabel offset 0,-2
+#set xlabel offset 0,-2
 set ytics offset -1
 #set xtics offset 0,-1
 

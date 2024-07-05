@@ -1,9 +1,8 @@
 
-set style line 1 lt 3 lw 2 pt 2
+set style line 1 lc 7 lw 2 pt 2
 #set term epslatex color colortext size 3,2.5 
 #set output 'figs/N_gamma-electron.tex'
 
-set grid
 set key top right
 set key box
 set key height 1
@@ -14,13 +13,15 @@ set key width 1
 
 unset key
 
-#set xtics 0e-15, 2e-15, 10e-15
+set decimalsign ","
 
-set xlabel font ",10"
-set ylabel font ",10"
+set xtics font ",12"
+set ytics font ",12"
+set xlabel font ",12"
+set ylabel font ",12"
 set ylabel "n ({/Symbol w})"
-set xlabel '{/Symbol w}[GeV]'
+set xlabel '{/Symbol w}[eV]'
 
-plot 'data/n_total.dat' with lines lw 2 linecolor 7 
+plot 'data/n_total.dat' with lines ls 1
 
 pause -1

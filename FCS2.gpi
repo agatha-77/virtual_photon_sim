@@ -5,6 +5,8 @@ set key height 1
 set key width 1
 unset key
 
+set logscale y
+
 set xlabel font ",15"
 set ylabel font ",15"
 set xtics font ",12"

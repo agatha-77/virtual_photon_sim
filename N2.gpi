@@ -1,20 +1,23 @@
+set palette cubehelix
 set pm3d map
-set logscale zcb 100
+set logscale zcb 
 unset key
 #set lmargin 5
 
 set title 'N_2({/Symbol w},b)'
-
-
 set title font 	",22"
+
 set xlabel font ",22"
 set ylabel font ",22"
+
 set xtics font 	",18"
 set ytics font 	",18"
+
 set cbtics font ",18"
 
 set ylabel offset -4
 set xlabel offset 0,-1
+
 set ytics offset -1
 set xtics offset 0,-1
 

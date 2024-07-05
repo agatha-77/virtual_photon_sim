@@ -1,20 +1,25 @@
-set grid
+
 set key top right
 set key box
 set key height 1
 set key width 1
 unset key
 
-set xlabel font ",15"
-set ylabel font ",15"
+set yrange[1e-2:1e1]
+set logscale y
+
+set decimalsign ","
+
+set xlabel font ",12"
+set ylabel font ",12"
 set xtics font ",12"
 set ytics font ",12"
 
 set ylabel offset -1
 
 set xlabel "W_{{/Symbol g}{/Symbol g}}[GeV]"
-set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> {/Symbol m}^+ {/Symbol m}^-}[fm]"
+set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> {/Symbol m}^+ {/Symbol m}^-}[b]"
 
-plot 'data/fundamental_muon_CS.dat' using 1:2 w lines lw 2 linecolor 8
+plot 'data/fundamental_muon_CS.dat' using 1:2 w lines lw 2 lc 8
 
 pause -1
