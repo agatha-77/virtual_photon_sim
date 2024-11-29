@@ -12,38 +12,63 @@
 #include "headers/cross_section.hpp"
 #include "headers/phys_const.hpp"
 
+// Protótipos das subrotinas que fazem a plotagem dos pontos.
+// É uma modularização para facilitar a modificação do programa
 void output_fundamental_electron_CS(const char FNAME[50]);
 void output_fundamental_muon_CS(const char FNAME[50]);
-void output_total_muon_CS(const char FNAME[50]);
+void output_fundamental_tau_CS(const char FNAME[50]);
+void output_total_electron_electron_CS(const char FNAME[50]);
+void output_total_muon_electron_CS(const char FNAME[50]);
+void output_total_tau_electron_CS(const char FNAME[50]);
+void output_total_muon_HI_CS(const char FNAME[50]);
 
 
+// Função principal
 int main()
 {
-	output_total_muon_CS("data/total_muon_CS.dat");
+//	output_fundamental_muon_CS("data/fundamental_muon_CS.dat");
+//	output_fundamental_electron_CS("data/fundamental_electron_CS.dat");
+//	output_fundamental_tau_CS("data/fundamental_tau_CS.dat");
+//	output_total_electron_electron_CS("data/total_electron_electron_CS.dat");
+//	output_total_muon_electron_CS("data/total_muon_electron_CS.dat");
+//	output_total_tau_electron_CS("data/total_tau_electron_CS.dat");
+	output_total_muon_HI_CS("data/total_muon_gold_CS.dat");
 
 	return 0;
 }
 
 
+// Seção de choque fundamental de colisão de fótons em pares de elétron-pósitron
 void output_fundamental_electron_CS(const char FNAME[50])
 {
-	const int NUM_PONTOS = 500;
-	const long double LOWER_W = 2*ELECTRON_MASS;
-	const long double UPPER_W = 10.0 * GSL_CONST_NUM_GIGA;
-	const long double STEP = fabs(UPPER_W - LOWER_W) / NUM_PONTOS;
+	const int NUM_PONTOS1 = 10000;
+	const int NUM_PONTOS2 = 1000;
+	const double LOWER_W = 2*ELECTRON_MASS;
+	const double UPPER_W = 10.0e9;
+
+	const double MIDDLE_W = max_value_CS(&fundamental_CS_electron, LOWER_W, UPPER_W);
+	const double STEP1 = fabs(MIDDLE_W - LOWER_W) / NUM_PONTOS1;
+	const double STEP2 = fabs(UPPER_W - MIDDLE_W) / NUM_PONTOS2;
 
 	std::ofstream dados_out(FNAME);
 	dados_out.setf(std::ios::scientific);
 	dados_out.setf(std::ios::showpos);
 	dados_out.precision(13);
 	
-	long double w = LOWER_W;
+	double w = LOWER_W;
 	double param = 0.0;
 
-	for(int i = 0; i < NUM_PONTOS; i++){
-		dados_out << w / GSL_CONST_NUM_GIGA << "\t" << fundamental_CS_electron(w, &param) *
-			EV_TO_BARN / GSL_CONST_NUM_MICRO << "\n";
-		w += STEP;
+	for(int i = 0; i < NUM_PONTOS1; i++){
+		dados_out << w / GSL_CONST_NUM_GIGA << "\t"
+			<< fundamental_CS_electron(w, &param) * EV_TO_BARN << "\n";
+		w += STEP1;
+	}
+
+	w = MIDDLE_W;
+	for(int i = 0; i < NUM_PONTOS2; i++){
+		dados_out << w / GSL_CONST_NUM_GIGA << "\t"
+			<< fundamental_CS_electron(w, &param) * EV_TO_BARN << "\n";
+		w += STEP2;
 	}
 
 	dados_out.close();
@@ -66,25 +91,26 @@ void output_fundamental_muon_CS(const char FNAME[50])
 	dados_out.setf(std::ios::showpos);
 	dados_out.precision(13);
 
-	std::cout << "* Iniciando plotagem da seção de choque fundamental\n";
+	std::cout << "\n* Iniciando plotagem da seção de choque fundamental\n";
 	std::cout << "\t- Máximo da seção de choque em torno de: " << MIDDLE_W << " eV\n";
 	std::cout << "\t- Número de pontos: " << NUM_PONTOS1 + NUM_PONTOS2 << "\n";
-	std::cout << "\t- Intervalo de plotagem: [" << LOWER_W << ":" << UPPER_W << "] [eV]\n\n";
+	std::cout << "\t- Intervalo de plotagem: [" << LOWER_W << ":" << UPPER_W
+		<< "] [eV]\n\n";
 	
 	long double w = LOWER_W;
 	double param = 0.0;
 
 	for(int i = 0; i < NUM_PONTOS1; i++){
-		dados_out << w / GSL_CONST_NUM_GIGA << "\t" << fundamental_CS_muon(w, &param) *
-			EV_TO_BARN << "\n";
+		dados_out << w / GSL_CONST_NUM_GIGA << "\t"
+			<< fundamental_CS_muon(w, &param) * EV_TO_BARN << "\n";
 
 		w += STEP1;
 	}
 
 	w = MIDDLE_W;
 	for(int i = 0; i < NUM_PONTOS2; i++){
-		dados_out << w / GSL_CONST_NUM_GIGA << "\t" << fundamental_CS_muon(w, &param) *
-			EV_TO_BARN << "\n";
+		dados_out << w / GSL_CONST_NUM_GIGA << "\t"
+			<< fundamental_CS_muon(w, &param) * EV_TO_BARN << "\n";
 
 		w += STEP2;
 	}
@@ -92,11 +118,149 @@ void output_fundamental_muon_CS(const char FNAME[50])
 	dados_out.close();
 }
 
-void output_total_muon_CS(const char FNAME[50])
+
+void output_fundamental_tau_CS(const char FNAME[50])
 {
-	const int NPONTOS = 10;
-	const double LOWER_E = 1.0	* GSL_CONST_NUM_GIGA;
-	const double UPPER_E = 10.0 * GSL_CONST_NUM_GIGA;
+	const int NUM_PONTOS1 = 10000;
+	const int NUM_PONTOS2 = 500;
+	const double LOWER_W = 2*TAU_MASS;
+	const double UPPER_W = 10.0e9;
+
+	const double MIDDLE_W = max_value_CS(&fundamental_CS_tau, LOWER_W, UPPER_W);
+	const double STEP1 = fabs(MIDDLE_W - LOWER_W) / NUM_PONTOS1;
+	const double STEP2 = fabs(UPPER_W - MIDDLE_W) / NUM_PONTOS2;
+
+	std::ofstream dados_out(FNAME);
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+	
+	double w = LOWER_W;
+	double param = 0.0;
+
+	for(int i = 0; i < NUM_PONTOS1; i++){
+		dados_out << w / GSL_CONST_NUM_GIGA << "\t"
+			<< fundamental_CS_tau(w, &param) * EV_TO_BARN << "\n";
+		w += STEP1;
+	}
+
+	w = MIDDLE_W;
+	for(int i = 0; i < NUM_PONTOS2; i++){
+		dados_out << w / GSL_CONST_NUM_GIGA << "\t"
+			<< fundamental_CS_tau(w, &param) * EV_TO_BARN << "\n";
+		w += STEP2;
+	}
+
+	dados_out.close();
+}
+
+
+void output_total_electron_electron_CS(const char FNAME[50])
+{
+	const int NPONTOS = 70;
+	const double LOWER_E = 1e3;
+	const double UPPER_E = 200e6;
+
+	const double STEP = fabs(UPPER_E - LOWER_E) / (double) NPONTOS;
+
+	std::ofstream dados_out(FNAME);
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	std::cout.setf(std::ios::scientific);
+	std::cout.setf(std::ios::showpos);
+	std::cout.precision(13);
+
+	double var_E = LOWER_E;
+	double err;
+
+	for (int i = 0; i < NPONTOS; i++){
+		dados_out << var_E / GSL_CONST_NUM_GIGA << "\t"
+			<< dilepton_TCS_electron(var_E, ELECTRON_MASS, &err) * EV_TO_BARN << "\t"
+			<< err << "\n";
+
+		var_E += STEP;
+	}
+
+	dados_out.close();
+}
+
+void output_total_muon_electron_CS(const char FNAME[50])
+{
+	const int NPONTOS = 800;
+	const double LOWER_E = MUON_MASS;
+	const double UPPER_E = 100e9;
+
+	const double STEP = fabs(UPPER_E - LOWER_E) / (double) NPONTOS;
+
+	std::ofstream dados_out(FNAME);
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	std::cout.setf(std::ios::scientific);
+	std::cout.setf(std::ios::showpos);
+	std::cout.precision(13);
+
+	double var_E = LOWER_E;
+	double err;
+	double result = dilepton_TCS_electron(var_E, MUON_MASS, &err);
+
+	std::cout << "\n--------------------------------------";
+	std::cout << "\n* Calculando seção de choque total.\n";
+	std::cout << "\t" << "var_E\t= " << var_E
+		<< "\n\tresult\t= " << result << "\n\terr\t= " << err
+	   	<< "\n\tSTEP\t= " << STEP << "\n";
+
+	for (int i = 0; i < NPONTOS; i++){
+		dados_out << var_E / GSL_CONST_NUM_GIGA << "\t"
+			<< dilepton_TCS_electron(var_E, MUON_MASS, &err) * EV_TO_BARN << "\t"
+			<< err << "\n";
+
+		var_E += STEP;
+	}
+
+	dados_out.close();
+}
+
+void output_total_tau_electron_CS(const char FNAME[50])
+{
+	const int NPONTOS = 200;
+	const double LOWER_E = TAU_MASS;
+	const double UPPER_E = 100e9;
+
+	const double STEP = fabs(UPPER_E - LOWER_E) / (double) NPONTOS;
+
+	std::ofstream dados_out(FNAME);
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	std::cout.setf(std::ios::scientific);
+	std::cout.setf(std::ios::showpos);
+	std::cout.precision(13);
+
+	double var_E = LOWER_E;
+	double err;
+
+	for (int i = 0; i < NPONTOS; i++){
+		dados_out << var_E / GSL_CONST_NUM_GIGA << "\t"
+			<< dilepton_TCS_electron(var_E, TAU_MASS, &err) * EV_TO_BARN << "\t"
+			<< err << "\n";
+
+		var_E += STEP;
+	}
+
+	dados_out.close();
+}
+
+
+void output_total_muon_HI_CS(const char FNAME[50])
+{
+	const int NPONTOS = 70;
+	const double LOWER_E = 310e6;
+	const double UPPER_E = 5e9;
 
 	const double STEP = fabs(UPPER_E - LOWER_E) / (double) NPONTOS;
 
@@ -107,14 +271,14 @@ void output_total_muon_CS(const char FNAME[50])
 
 	double var_E = LOWER_E;
 	double err;
-	double result = total_muon_cross_section(var_E, &err);
+	double result = dilepton_TCS_EPA(var_E, MUON_MASS, &err);
 
 	std::cout << var_E << "\t" << result << "\t" << err << "\n";
 
 	/*
 	for (int i = 0; i < NPONTOS; i++){
 		dados_out << var_E / GSL_CONST_NUM_GIGA << "\t"
-			<< total_muon_cross_section(var_E, &err) << "\t" << err << "\n";
+			<< muon_TCS_electron(var_E, &err)  * EV_TO_BARN << "\t" << err << "\n";
 
 		var_E += STEP;
 	}

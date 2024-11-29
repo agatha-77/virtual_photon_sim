@@ -10,6 +10,8 @@ set lmargin 5
 set title "N_1({/Symbol w},b)"
 set title font 	",22"
 
+set format cb "10^{%L}"
+
 #set ytics rotate by 45 right
 set cbtics rotate by 45 left
 
@@ -18,19 +20,16 @@ set ylabel font ",22"
 
 set xtics font 	",18"
 set ytics font 	",18"
-
 set cbtics font ",18"
-
 set ylabel offset -6
 set xlabel offset 0,-1
 
 set ytics offset -1
 set xtics offset 0,-1
-
 set ytics 0,10,50
 set xtics 0,10,50
 
-set xlabel "{/Symbol w}[GeV]"
+set xlabel "{/Symbol w}[MeV]"
 set ylabel "b [fm]"
 
 splot 'data/N1_map.dat'

@@ -1,0 +1,22 @@
+set style line 1 lc 1 lw 2 dt 1
+
+set key bottom right
+set key box
+set key height 1
+set key width 1
+
+set decimalsign ","
+
+set xtics font "Times,15"
+set ytics font "Times,15"
+set xlabel font "Times,20"
+set ylabel font "Times,20"
+set key font "Times,15"
+set ylabel "n ({/Symbol w})"
+set xlabel '{/Symbol w}[eV]'
+
+set format x "%0.lx10^{%L}"
+
+plot 'data/n_total.dat' u 1:4 w l ls 1 t "e^-"
+
+pause -1

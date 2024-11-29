@@ -1,12 +1,15 @@
+set style line 1 lc 7 lw 2 dt 1
+set style line 2 lc 8 lw 2 dt 4
+set style line 3 lc 3 lw 2 dt 2
 
 set key top right
 set key box
 set key height 1
 set key width 1
-unset key
 
-set yrange[1e-2:1e1]
+set yrange[1e-10:1e-4]
 set logscale y
+set format y "10^{%L}"
 
 set decimalsign ","
 
@@ -15,11 +18,13 @@ set ylabel font ",12"
 set xtics font ",12"
 set ytics font ",12"
 
+set key font ",12"
+
 set ylabel offset -1
 
 set xlabel "W_{{/Symbol g}{/Symbol g}}[GeV]"
-set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> {/Symbol m}^+ {/Symbol m}^-}[b]"
+set ylabel "{/Symbol s}_{{/Symbol g}{/Symbol g} -> l^+ l^-}[b]"
 
-plot 'data/fundamental_muon_CS.dat' using 1:2 w lines lw 2 lc 8
+plot 'data/fundamental_muon_CS.dat' using 1:2 w lines ls 1 t "{/Symbol m}^+{/Symbol m}^-", 'data/fundamental_electron_CS.dat' w l ls 2 t "e^+e^-", 'data/fundamental_tau_CS.dat' w l ls 3 t "{/Symbol t}^+ {/Symbol t}^-"
 
 pause -1

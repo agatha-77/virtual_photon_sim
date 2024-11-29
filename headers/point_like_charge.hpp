@@ -8,8 +8,8 @@
  * analiticamente.
  */
 
-#ifndef POINT_CHARGE_DISTRIBUTION
-#define POINT_CHARGE_DISTRIBUTION
+#ifndef HARD_SPHERE_DISTRIBUTION
+#define HARD_SPHERE_DISTRIBUTION
 
 #include <cmath>
 
@@ -31,66 +31,70 @@ double K1(double b_ARG)
 	return gsl_sf_bessel_K1(b_ARG);
 }
 
-// Função de velocidade em termos da frequencia assumindo comportamento
-// ondulatório da partícula. 
-double vel_f(double freq, double mass){
-
-	double vel = sqrt(1 - (mass*mass) / (freq*freq)) * LIGHT_VEL;
-
-	return vel;
-}
-
-// Argumento da função de Bessel 
-double bess_arg(double frequency, double imp_par)
+// Parâmetros do íon (massa e energia de centro de massa)
+struct ion_params
 {
-	double vel = vel_f(frequency, ELECTRON_MASS);
-	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - (beta*beta) );
-
-	return ( frequency * imp_par )/(gamma * vel); 
-}
+	int mass_num;
+	int atomic_num;
+	double energy_CMS; // Raiz de s sobre 2
+};
 
 
 // N(w,b) do pulso paralelo P1
-double ep_num_par(double frequency, double imp_par) {
-	double vel = vel_f(frequency, ELECTRON_MASS);
-	double beta = vel / LIGHT_VEL;
-	double gamma = 1.0/sqrt( 1.0 - beta*beta );
-	double bessel_arg = bess_arg(frequency, imp_par);
+double ep_num_par(double frequency, double imp_par, void* params)
+{
+	struct ion_params* cast_params = (struct ion_params*) params;
 
-	return ION_CHARGE * bessel_arg*bessel_arg * K0(bessel_arg)*K0(bessel_arg) /
-		( PI*PI * beta*beta * frequency * imp_par*imp_par * gamma*gamma *
-		  PLANCK_REDU);
+	double mass = cast_params->atomic_num * PROTON_MASS + 
+		(cast_params->mass_num - cast_params->atomic_num) * NEUTRON_MASS;
+	double gamma = cast_params->energy_CMS / mass;
+
+	double beta = sqrt(1.0 - 1.0 / (gamma*gamma));
+	double bessel_arg = frequency * imp_par / gamma * beta;
+
+	return FINE_STRUCT_CONST * cast_params->atomic_num * bessel_arg*bessel_arg
+		* K0(bessel_arg)*K0(bessel_arg) /
+		( PI*PI * beta*beta * frequency * imp_par*imp_par * gamma*gamma);
 }
 
 
 // N(w,b) do pulso perpendicular P2
-double ep_num_perp(double frequency, double imp_par)
+double ep_num_perp(double frequency, double imp_par, void* params)
 {
-	double vel = vel_f(frequency, ELECTRON_MASS);
-	double beta = vel / LIGHT_VEL;
-	double bessel_arg = bess_arg(frequency, imp_par);
+	struct ion_params* cast_params = (struct ion_params*) params;
+	double mass = cast_params->atomic_num * PROTON_MASS + 
+		(cast_params->mass_num - cast_params->atomic_num) * NEUTRON_MASS;
+	double gamma = (cast_params->energy_CMS + mass) / mass;
 
-	return ION_CHARGE * bessel_arg*bessel_arg * K1(bessel_arg)*K1(bessel_arg) /
-		( PI*PI * beta*beta * frequency * imp_par*imp_par * PLANCK_REDU );
+	double beta = sqrt(1.0 - 1.0 / (gamma*gamma));
+	double bessel_arg = frequency * imp_par / gamma * beta;
+
+	return FINE_STRUCT_CONST * cast_params->atomic_num * bessel_arg*bessel_arg
+		* K1(bessel_arg)*K1(bessel_arg) /
+		( PI*PI * beta*beta * frequency * imp_par*imp_par * frequency );
 }
 
 
 // Numero total de fotons equivalentes integrado sobre os parametros de impacto
-double ep_num_total(double frequency)
+double ep_num_total(double frequency, void* params)
 {
-	const double IMP_PAR_MIN = 2.0 * GSL_CONST_MKSA_BOHR_RADIUS * METRE_TO_EV;
-//	const double IMP_PAR_MIN = ATOMIC_RADIUS;
+	struct ion_params* cast_params = (struct ion_params*) params;
 
-	double vel = vel_f(frequency, ELECTRON_MASS);
-	double beta = vel / LIGHT_VEL;
-	double bessel_arg = bess_arg(frequency, IMP_PAR_MIN);
+	const double IMP_PAR_MIN = 2.0* 5.916 * pow(cast_params->mass_num,1.0/3.0) *
+		(1.0 / GSL_CONST_NUM_GIGA);
+	double mass = cast_params->atomic_num * PROTON_MASS +
+		(cast_params->mass_num - cast_params->atomic_num) * NEUTRON_MASS;
+	double gamma = cast_params->energy_CMS / mass;
 
-	double frontal_mult = 2 * ION_CHARGE * ION_CHARGE / (PI*(beta*beta) * frequency);
+	double beta = sqrt(1.0 - 1.0 / (gamma*gamma));
+	double bessel_arg = frequency * IMP_PAR_MIN / (gamma * beta);
+
+	double frontal_mult = 2 * FINE_STRUCT_CONST * cast_params->atomic_num /
+		(PI*(beta*beta) * frequency);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
 			(beta*beta * bessel_arg*bessel_arg) * ( K1(bessel_arg)*K1(bessel_arg) -
-				K0(bessel_arg)*K0(bessel_arg) ) / 2.0);
+			K0(bessel_arg)*K0(bessel_arg) ) / 2.0);
 }
 
 #endif
