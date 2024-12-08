@@ -1,9 +1,9 @@
 
 /*
- * Biblioteca para cálculo de seções de choque e quantidades relacionadas 
- * (valor máximo de seção de choque e afins).
+ * Biblioteca para calculo de secoes de choque e quantidades relacionadas 
+ * (valor maximo de secao de choque e afins).
  *
- * Unidades naturais são usadas
+ * Unidades naturais sao usadas
  */
 
 #ifndef CROSS_SECTION
@@ -15,12 +15,14 @@
 #include <gsl/gsl_monte_vegas.h>
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_deriv.h>
+#include <gsl/gsl_errno.h>
 
 #include "phys_const.hpp"
 #include "point_like_charge.hpp"
 #include "electron_flux.hpp"
 
 
+// Seções de choque fundamentais dos léptons
 double fundamental_CS_muon(double arg, void* params)
 {
 	(void)(params);
@@ -100,29 +102,31 @@ double fundamental_CS_dilepton(double cms_energy, double lepton_mass, void* para
 		(2* log( (w / (2*mass)) * 
 		(1 + sqrt(1 - (4*mass*mass / (w*w))) )) *
 		(1 + (4*mass*mass*w*w - 8*mass*mass*mass*mass)/(w*w*w*w) ) -
-		sqrt(1 - (4*mass*mass) /(w*w) ) * (1 + 4*mass*mass/(w*w)) );
+		sqrt(1 - (4*mass*mass) /(w*w) ) * (1 + (4*mass*mass)/(w*w)) );
 }
 
-/*
+/* ****************************************
  * Parte de Integrais
+ * ****************************************
  * */
 
 
+// Estruturas de dados utilizadas nas rotinas
 struct integrand_params
 {
-	double beam_energy;
-	double var1;
-	double produced_mass;
+	double beam_energy; // Energia de feixe
+	double var1; // Outra variavel
+	double produced_mass; // Massa do sistema produzido
 };
 
 struct dilepton_params
 {
-	double beam_energy;
-	double lepton_mass;
+	double beam_energy; // Energia de feixe
+	double lepton_mass; // Massa do sistema produzido
 };
 
 
-// Arrumar isso aqui
+// Funcao do integrando
 double dilepton_integrand1_electron(double var2, void* params)
 {
 	struct integrand_params* cast_params = (struct integrand_params*) params;
@@ -140,6 +144,7 @@ double dilepton_integrand1_electron(double var2, void* params)
 		fundamental_CS_dilepton(sqrt(4*var1*var2), mass, &dummy);
 }
 
+// Primeira subrotina de integracao
 double dilepton_integrand2_electron(double var1, void* params)
 {
 	gsl_integration_workspace* w = gsl_integration_workspace_alloc(5000);
@@ -159,9 +164,9 @@ double dilepton_integrand2_electron(double var1, void* params)
 	integr_func.params = &lepton_params;
 
 	gsl_integration_qag(&integr_func, 
-			mass*mass / var1, beam_energy,
-			1e-10, 1e-3,
-			5000, 1,
+			mass*mass / var1, beam_energy, // Limites
+			1e-10, 1e-3, // Tolerancias absoluta e relativa
+			5000, 1, // Numero de passos e metodo (ver manual)
 			w, &result, &error);
 
 	gsl_integration_workspace_free(w);
@@ -169,9 +174,11 @@ double dilepton_integrand2_electron(double var1, void* params)
 	return result;
 }
 
+// Rotina externa de integracao
 double dilepton_TCS_electron(double beam_energy, double lepton_mass, double* err)
 {
 	gsl_integration_workspace* w = gsl_integration_workspace_alloc(5000);
+	gsl_set_error_handler_off();
 
 	double result;
 	struct dilepton_params params;
@@ -194,6 +201,7 @@ double dilepton_TCS_electron(double beam_energy, double lepton_mass, double* err
 }
 
 
+// Integrando para EPA
 double muon_integrand1_EPA(double var2, void* params)
 {
 	struct integrand_params* cast_params = (struct integrand_params*) params;
@@ -212,11 +220,12 @@ double muon_integrand1_EPA(double var2, void* params)
 	pb208_params.mass_num = 208;
 	pb208_params.energy_CMS = cms_energy;
 
-	return (ep_num_total(var1, &gold179_params)/var1) * 
-		(ep_num_total(var2, &gold179_params)/var2) *
-		fundamental_CS_dilepton(sqrt(4*var1*var2), mass, &dummy);
+	return (ep_num_total(var1*cms_energy, &pb208_params)/var1) * 
+		(ep_num_total(var2*cms_energy, &pb208_params)/var2) *
+		fundamental_CS_dilepton(sqrt(4*var1*var2*cms_energy*cms_energy), mass, &dummy);
 }
 
+// Rotina interna de integracao
 double muon_integrand2_EPA(double var1, void* params)
 {
 	gsl_integration_workspace* w = gsl_integration_workspace_alloc(500);
@@ -229,13 +238,14 @@ double muon_integrand2_EPA(double var1, void* params)
 	struct integrand_params lepton_params;
 	lepton_params.beam_energy = beam_energy;
 	lepton_params.var1 = var1;
+	lepton_params.produced_mass = mass;
 
 	gsl_function integr_func;
 	integr_func.function = &muon_integrand1_EPA;
 	integr_func.params = &lepton_params;
 
 	gsl_integration_qag(&integr_func,
-			mass*mass / var1, beam_energy*beam_energy / var1,
+			mass*mass / (beam_energy*beam_energy*var1), 1.0,
 			1e-10, 1e-3,
 			500, 3,
 			w, &result, &error);
@@ -245,9 +255,11 @@ double muon_integrand2_EPA(double var1, void* params)
 	return result;
 }
 
+// Rotina externa de integracao
 double dilepton_TCS_EPA(double beam_energy, double lepton_mass, double* err)
 {
 	gsl_integration_workspace* w = gsl_integration_workspace_alloc(500);
+	gsl_set_error_handler_off();
 
 	double result;
 	struct dilepton_params params;
@@ -259,7 +271,7 @@ double dilepton_TCS_EPA(double beam_energy, double lepton_mass, double* err)
 	integr_func.params = &params;
 
 	gsl_integration_qag(&integr_func,
-			lepton_mass, beam_energy,
+			lepton_mass/beam_energy, 1.0,
 			1e-10, 1e-3,
 			500, 3,
 			w, &result, err);

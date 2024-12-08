@@ -1,10 +1,10 @@
 
 /*
- * Biblioteca para o caso de uma partícula com distribuição pontual de carga.
+ * Biblioteca para o caso de uma partícula com distribuicao pontual de carga.
  *
- * Aqui, estamos usando unidades SI (MKSA) ao invés das naturais, uma vez que
- * são estas as disponíveis na biblioteca GSL. As funções aqui definidas são
- * feitas de forma direta, uma vez que os cálculos para tais é solúvel
+ * Aqui, estamos usando unidades SI (MKSA) ao inves das naturais, uma vez que
+ * sao estas as disponíveis na biblioteca GSL. As funcoes aqui definidas sao
+ * feitas de forma direta, uma vez que os calculos para tais e soluvel
  * analiticamente.
  */
 
@@ -89,7 +89,8 @@ double ep_num_total(double frequency, void* params)
 	double beta = sqrt(1.0 - 1.0 / (gamma*gamma));
 	double bessel_arg = frequency * IMP_PAR_MIN / (gamma * beta);
 
-	double frontal_mult = 2 * FINE_STRUCT_CONST * cast_params->atomic_num /
+	double frontal_mult = 2 * FINE_STRUCT_CONST
+		* cast_params->atomic_num *cast_params->atomic_num /
 		(PI*(beta*beta) * frequency);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -

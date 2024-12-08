@@ -1,3 +1,9 @@
+/*
+ * Biblioteca para calculo das secoes de choque usando
+ * integracao de monte carlo.
+ * 
+ * Segue a mesma estrutura da outra biblioteca.
+ */
 
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_monte.h>
