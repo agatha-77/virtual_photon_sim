@@ -25,6 +25,7 @@ const double ATOMIC_RADIUS = 1.0423e-5;
 
 // Definição de constantes de multiplicação para passar para unidades de interesse
 const double EV_TO_BARN = 3.894e14; // GEV^{-2}
+const double GEV_TO_BARN = 0.3894e-3;
 const double METRE_TO_EV = 1.0 / ( 0.197 * GSL_CONST_NUM_MICRO); // Metro pra eV
 
 

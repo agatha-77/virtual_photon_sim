@@ -10,8 +10,9 @@ set key width 1
 set decimalsign ","
 
 set logscale y
+#set logscale x
 
-set yrange[1e-100:1e-20]
+#set yrange[1e-100:1e-20]
 
 set xlabel font ",12"
 set ylabel font ",12"

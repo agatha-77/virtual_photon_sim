@@ -12,7 +12,7 @@ int main()
 {
 	std::cout.setf(std::ios::scientific);
 	std::cout.setf(std::ios::showpos);
-	std::cout.precision(6);
+	std::cout.precision(8);
 
 	gsl_set_error_handler_off();
 

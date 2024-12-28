@@ -6,13 +6,13 @@ all:
 	make cross_section_mass
 	make cross_section_EPA_qag
 
-cross_section: cross_section.cpp headers/cross_section.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/electron_flux.hpp
+cross_section: cross_section.cpp headers/cross_section.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/electron_flux.hpp headers/point_fraction_flux.hpp
 	g++ -Wall cross_section.cpp -lgsl -lm -o cross_section
 
-cross_section_monte_vegas: cross_section_MVEGAS.cpp headers/cross_section_monte_carlo.hpp headers/phys_const.hpp headers/point_like_charge.hpp 
+cross_section_monte_vegas: cross_section_MVEGAS.cpp headers/cross_section_monte_carlo.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/point_fraction_flux.hpp
 	g++ -Wall cross_section_MVEGAS.cpp -lgsl -o cross_section_monte_vegas
 
-cross_section_mass: cross_section_mass.cpp headers/cross_section.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/electron_flux.hpp
+cross_section_mass: cross_section_mass.cpp headers/cross_section.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/electron_flux.hpp headers/point_fraction_flux.hpp
 	g++ -Wall cross_section_mass.cpp -lgsl -lm -o cross_section_mass
 
 cross_section_EPA_qag: cross_section_EPA_qag.cpp headers/cross_section.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/electron_flux.hpp headers/point_fraction_flux.hpp

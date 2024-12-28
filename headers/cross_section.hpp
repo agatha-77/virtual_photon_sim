@@ -20,6 +20,7 @@
 #include "phys_const.hpp"
 #include "point_like_charge.hpp"
 #include "electron_flux.hpp"
+#include "point_fraction_flux.hpp"
 
 
 // Seções de choque fundamentais dos léptons
@@ -220,8 +221,8 @@ double muon_integrand1_EPA(double var2, void* params)
 	pb208_params.mass_num = 208;
 	pb208_params.energy_CMS = cms_energy;
 
-	return (ep_num_total(var1*cms_energy, &pb208_params)/var1) * 
-		(ep_num_total(var2*cms_energy, &pb208_params)/var2) *
+	return (ep_num_total(var1, &pb208_params) / var1) * 
+		(ep_num_total(var2, &pb208_params) / var2) *
 		fundamental_CS_dilepton(sqrt(4*var1*var2*cms_energy*cms_energy), mass, &dummy);
 }
 
@@ -246,7 +247,7 @@ double muon_integrand2_EPA(double var1, void* params)
 
 	gsl_integration_qag(&integr_func,
 			mass*mass / (beam_energy*beam_energy*var1), 1.0,
-			1e-10, 1e-3,
+			1e-10, 1e-6,
 			500, 3,
 			w, &result, &error);
 
@@ -272,7 +273,7 @@ double dilepton_TCS_EPA(double beam_energy, double lepton_mass, double* err)
 
 	gsl_integration_qag(&integr_func,
 			lepton_mass/beam_energy, 1.0,
-			1e-10, 1e-3,
+			1e-10, 1e-6,
 			500, 3,
 			w, &result, err);
 

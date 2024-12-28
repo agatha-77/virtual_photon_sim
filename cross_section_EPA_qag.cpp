@@ -16,9 +16,33 @@ void output_to_energy(const char FNAME[50], double lepton_mass);
 
 int main()
 {
+	const double ENERGY_BEAM1 = 200e9;
+	const double ENERGY_BEAM2 = 1000e9;
+	const double ENERGY_BEAM3 = 1500e9;
+
 	std::cout.setf(std::ios::scientific);
 	std::cout.setf(std::ios::showpos);
 	std::cout.precision(6);
+
+	double err;
+
+	std::cout << "--------------------------------------------\n";
+	std::cout << "electron mass = " << ELECTRON_MASS << "\t";
+	std::cout << "muon mass = " << MUON_MASS << "\t";
+	std::cout << "tau mass = " << TAU_MASS << "\n";
+	std::cout << ENERGY_BEAM1 << "\t" 
+		<< dilepton_TCS_EPA(ENERGY_BEAM1, ELECTRON_MASS, &err) * EV_TO_BARN << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM1, MUON_MASS, &err) * EV_TO_BARN << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM1, TAU_MASS, &err) * EV_TO_BARN << "\n";
+	std::cout << ENERGY_BEAM2 << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM2, ELECTRON_MASS, &err) * EV_TO_BARN << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM2, MUON_MASS, &err) * EV_TO_BARN << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM2, TAU_MASS, &err) * EV_TO_BARN << "\n";
+	std::cout << ENERGY_BEAM3 << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM3, ELECTRON_MASS, &err) * EV_TO_BARN << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM3, MUON_MASS, &err) * EV_TO_BARN << "\t"
+		<< dilepton_TCS_EPA(ENERGY_BEAM3, TAU_MASS, &err) * EV_TO_BARN << "\n";
+	std::cout << "--------------------------------------------\n\n";
 
 	output_to_mass("data/TCS_mass_pb208_flux.dat");
 
@@ -32,14 +56,9 @@ int main()
 // Imprime para massa
 void output_to_mass(const char FNAME[50])
 {
-	std::ofstream dados_out(FNAME);
-	dados_out.setf(std::ios::scientific);
-	dados_out.setf(std::ios::showpos);
-	dados_out.precision(13);
-
-	const int NPONTOS1 = 300;
-	const double LOWER_M = 1e6;
-	const double UPPER_M = 20e9;
+	const int NPONTOS1 = 200;
+	const double LOWER_M = 1e9;
+	const double UPPER_M = 1000e9;
 
 	const double ENERGY_BEAM1 = 500e9;
 	const double ENERGY_BEAM2 = 1000e9;
@@ -58,6 +77,11 @@ void output_to_mass(const char FNAME[50])
 	std::cout << "cms_energy1 =\t" << ENERGY_BEAM1 << "\ncms_energy2 =\t"
 		<< ENERGY_BEAM2 << "\ncms_energy3 =\t" << ENERGY_BEAM3 << "\n";
 
+	std::ofstream dados_out(FNAME);
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
 	for (int i = 0; i < NPONTOS1; i++){
 		dados_out << var_M / GSL_CONST_NUM_GIGA << "\t"
 			<< dilepton_TCS_EPA(ENERGY_BEAM1, var_M, &err1) * EV_TO_BARN << "\t"
@@ -74,7 +98,7 @@ void output_to_mass(const char FNAME[50])
 // Imprime para energia
 void output_to_energy(const char FNAME[50], double lepton_mass)
 {
-	const int NPONTOS = 500;
+	const int NPONTOS = 100;
 	const double LOWER_E = 100e9;
 	const double UPPER_E = 1000e9;
 
@@ -97,6 +121,7 @@ void output_to_energy(const char FNAME[50], double lepton_mass)
 	std::cout << "\t" << "var_E\t= " << var_E
 		<< "\n\tresult\t= " << result << "\n\terr\t= " << err
 	   	<< "\n\tSTEP\t= " << STEP << "\n";
+	std::cout << "Produced system mass = " << lepton_mass << "\n\n";
 
 	for (int i = 0; i < NPONTOS; i++){
 		dados_out << var_E / GSL_CONST_NUM_GIGA << "\t"

@@ -11,7 +11,7 @@
 
 
 
-double EPA_fraction_flux(double arg_fraction, void* params)
+double epa_fraction_flux(double arg_fraction, void* params)
 {
 	struct ion_params* cast_params = (struct ion_params*) params;
 
@@ -27,7 +27,7 @@ double EPA_fraction_flux(double arg_fraction, void* params)
 
 	double frontal_mult = 2 * FINE_STRUCT_CONST
 		* cast_params->atomic_num *cast_params->atomic_num /
-		(PI*(beta*beta) * arg_fraction * cast_params->energy_CMS*cast_params->energy_CMS);
+		(PI*(beta*beta) * arg_fraction * cast_params->energy_CMS);
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
 			(beta*beta * bessel_arg*bessel_arg) * ( K1(bessel_arg)*K1(bessel_arg) -

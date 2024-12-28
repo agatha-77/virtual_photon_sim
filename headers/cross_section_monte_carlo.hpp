@@ -113,6 +113,8 @@ double dilepton_TCS_EPA_monte_vegas(double beam_energy, double mass, double* err
 	lepton_params.beam_energy = beam_energy;
 	lepton_params.lepton_mass = mass;
 
+	gsl_set_error_handler_off();
+
 	x_i[0] = mass / beam_energy; x_f[0] = 1.0;
 	x_i[1] = mass*mass / (beam_energy*beam_energy * x_i[0]);
 	x_f[1] = 1.0;
