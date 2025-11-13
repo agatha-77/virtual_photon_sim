@@ -29,10 +29,10 @@ int main()
 	std::cout << "var[0] =\t" << var[0] << "\tomega_1 =\t" << var[0]*cms_energy << "\n";
 	std::cout << "var[1] =\t" << var[1] << "\tomega_2 =\t" << var[1]*cms_energy << "\n";
 
-	std::cout << "epa(omega_1) =\t" << ep_num_total(var[0]*cms_energy, &pb208_params) << "\t";
-	std::cout << "epa(omega_2) =\t" << ep_num_total(var[1]*cms_energy, &pb208_params) << "\n";
-	std::cout << "f(omega_1) =\t" << ep_num_total(var[0]*cms_energy, &pb208_params) / var[0] << "\t";
-	std::cout << "f(omega_2) =\t" << ep_num_total(var[1]*cms_energy, &pb208_params) / var[1] << "\n";
+	std::cout << "epa(omega_1) =\t" << epa_photon_flux(var[0]*cms_energy, &pb208_params) << "\t";
+	std::cout << "epa(omega_2) =\t" << epa_photon_flux(var[1]*cms_energy, &pb208_params) << "\n";
+	std::cout << "f(omega_1) =\t" << epa_photon_flux(var[0]*cms_energy, &pb208_params) / var[0] << "\t";
+	std::cout << "f(omega_2) =\t" << epa_photon_flux(var[1]*cms_energy, &pb208_params) / var[1] << "\n";
 
 	std::cout << "fundamental_CS =\t"
 		<< fundamental_CS_dilepton(sqrt(4*var[0]*var[1]*cms_energy*cms_energy),

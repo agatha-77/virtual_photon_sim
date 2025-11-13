@@ -7,7 +7,7 @@ set key box
 set key height 1
 set key width 1
 
-#set yrange[1e-10:1e-4]
+set yrange[1e-10:1e-4]
 set logscale y
 set format y "10^{%L}"
 

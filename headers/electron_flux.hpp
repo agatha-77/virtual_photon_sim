@@ -1,7 +1,6 @@
 /*
  * Biblioteca para fluxo de fótons do elétron.
  *
- *
  */
 #ifndef ELECTRON_FLUX
 #define ELECTRON_FLUX
@@ -25,7 +24,8 @@ double electron_photon_flux(double freq, void* params)
 	double frontal_mult = FINE_STRUCT_CONST / PI;
 	double energy = cast_params->energy_CMS / 2.0;
 
-	double max_virt= cast_params->produced_system_mass * cast_params->produced_system_mass;
+	double max_virt= cast_params->produced_system_mass *
+		cast_params->produced_system_mass;
 	double min_virt= ELECTRON_MASS * ELECTRON_MASS * freq * freq
 		/ (energy* (energy - freq));
 

@@ -8,8 +8,8 @@
  * analiticamente.
  */
 
-#ifndef HARD_SPHERE_DISTRIBUTION
-#define HARD_SPHERE_DISTRIBUTION
+#ifndef PHOTON_SPECTRA
+#define PHOTON_SPECTRA
 
 #include <cmath>
 
@@ -76,11 +76,11 @@ double ep_num_perp(double frequency, double imp_par, void* params)
 
 
 // Numero total de fotons equivalentes integrado sobre os parametros de impacto
-double ep_num_total(double frequency, void* params)
+double epa_photon_flux(double frequency, void* params)
 {
 	struct ion_params* cast_params = (struct ion_params*) params;
 
-	const double IMP_PAR_MIN = 2.0* 5.916 * pow(cast_params->mass_num,1.0/3.0) *
+	const double IMP_PAR_MIN = 5.916 * pow(cast_params->mass_num,1.0/3.0) *
 		(1.0 / GSL_CONST_NUM_GIGA);
 	double mass = cast_params->atomic_num * PROTON_MASS +
 		(cast_params->mass_num - cast_params->atomic_num) * NEUTRON_MASS;
@@ -91,7 +91,7 @@ double ep_num_total(double frequency, void* params)
 
 	double frontal_mult = 2 * FINE_STRUCT_CONST
 		* cast_params->atomic_num *cast_params->atomic_num /
-		(PI*(beta*beta) * frequency);
+		(PI*(beta*beta));
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
 			(beta*beta * bessel_arg*bessel_arg) * ( K1(bessel_arg)*K1(bessel_arg) -

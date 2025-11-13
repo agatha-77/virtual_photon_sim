@@ -52,8 +52,8 @@ double integrand_EPA_dilepton(double* var, size_t dim, void* params)
 	pb208_params.mass_num = 208;
 	pb208_params.energy_CMS = cms_energy;
 
-	return (ep_num_total(var1*cms_energy, &pb208_params)/var1) * 
-		(ep_num_total(var2*cms_energy, &pb208_params)/var2) *
+	return (epa_photon_flux(var1*cms_energy, &pb208_params)/var1) * 
+		(epa_photon_flux(var2*cms_energy, &pb208_params)/var2) *
 		fundamental_CS_dilepton(sqrt(4*var1*var2*cms_energy*cms_energy), mass, &dummy);
 }
 
