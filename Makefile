@@ -16,7 +16,7 @@ cross_section_monte_vegas: cross_section_MVEGAS.cpp headers/cross_section_monte_
 cross_section_EPA_qag: cross_section_EPA_qag.cpp headers/cross_section.hpp headers/phys_const.hpp headers/point_like_charge.hpp headers/electron_flux.hpp
 	g++ -Wall cross_section_EPA_qag.cpp -lgsl -lm -o cross_section_EPA_qag
 
-frequency_spectrum: frequency_spectrum.cpp headers/point_like_charge.hpp headers/electron_flux.hpp
+frequency_spectrum: frequency_spectrum.cpp headers/point_like_charge.hpp headers/electron_flux.hpp headers/extended_photon_fluxes.hpp
 	g++ -Wall -O frequency_spectrum.cpp -lgsl -lm -o frequency_spectrum
 
 teste: teste.cpp headers/phys_const.hpp headers/point_like_charge.hpp

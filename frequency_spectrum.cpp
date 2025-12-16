@@ -2,24 +2,51 @@
 // Programa de cálculo de número de fótons equivalentes usando a biblioteca
 // de cálculo numérico científico GNU Scientific Library (GSL)
 // ***********************************************************************
-//
-// O programa faz os cálculos em SI e, após isso, salva o resultado no arquivo
-// em unidades naturais. Em nota, achei mais fácil assim.
 
-#include<iostream>
-#include<fstream>
-#include<cassert>
-#include<cmath>
+#include <iostream>
+#include <fstream>
+#include <cassert>
+#include <cmath>
 
 //Inclusão da bilbioteca das funções para fluxo de fotons
-#include"headers/point_like_charge.hpp"
-#include"headers/electron_flux.hpp"
+#include "headers/point_like_charge.hpp"
+#include "headers/extended_photon_fluxes.hpp"
+#include "headers/electron_flux.hpp"
 
+/*
+ * Prototipos das funcoes
+ */
+void outputN_EPA(const char FNAME_N1[50], const char FNAME_N2[50]);
+void output_ratio_EPA(const char FNAME[50]);
+void output_freq_EPA_ions(const char FNAME[50]);
+void output_freq_EPA_energy(const char FNAME[50]);
+
+void output_charge_distribution(const char FNAME[50]);
+void output_form_factor(const char FNAME[50]);
+
+
+int main(int argc, char *argv[])
+{
+	std::cout << "Iniciando cálculo dos pontos.\n";
+
+//	outputN_EPA("data/N1_map.dat", "data/N2_map.dat");
+//	output_ratio_EPA("data/ratio.dat");
+
+	output_freq_EPA_ions("data/n_total.dat");
+	output_freq_EPA_energy("data/n_total_energy.dat");
+
+	output_charge_distribution("data/wood_saxon_dist.dat");
+	output_form_factor("data/form_factor.dat");
+
+	std::cout << "\nCálculo concluído.\n";
+
+	return 0;
+}
 
 // Faz o output dos pontos de N1 e N2 em um mapa bidimensional (x,y), levando
 // em conta o requisito do GNUPLOT de colocar uma linha em branco para cada
 // atualização do valor de x.
-void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
+void outputN_EPA(const char FNAME_N1[50], const char FNAME_N2[50])
 {
 	const int NUM_PONTOS = 50;
 
@@ -91,7 +118,7 @@ void output_N1_and_N2(const char FNAME_N1[50], const char FNAME_N2[50])
 }
 
 // Printa a razão entre o N1 e o N2 para uma escolha da frequencia
-void output_ratio(const char FNAME[50])
+void output_ratio_EPA(const char FNAME[50])
 {
 	const int NUM_PONTOS = 500;
 	const long double LOWER_B = 0.5e-16;
@@ -141,7 +168,7 @@ void output_ratio(const char FNAME[50])
 
 // Faz o output do número de fótons totais integrados sobre o parâmetro de
 // impacto
-void output_n_ions(const char FNAME[50])
+void output_freq_EPA_ions(const char FNAME[50])
 {
 	const int NUM_PONTOS = 6000;
 
@@ -215,26 +242,26 @@ void output_n_ions(const char FNAME[50])
 	dados_out.close();
 }
 
-void output_n_energy(const char FNAME[50])
+void output_freq_EPA_energy(const char FNAME[50])
 {
 	const double E1 = 500e9;
 	const double E2 = 3e12;
 	const double E3 = 5e12;
 
-	struct ion_params pb208_par_1;
-	pb208_par_1.atomic_num = 82;
-	pb208_par_1.mass_num = 208;
-	pb208_par_1.energy_CMS = E1;
+	struct ion_params pb208_par1;
+	pb208_par1.atomic_num = 82;
+	pb208_par1.mass_num = 208;
+	pb208_par1.energy_CMS = E1;
 
-	struct ion_params pb208_par_2;
-	pb208_par_2.atomic_num = 82;
-	pb208_par_2.mass_num = 208;
-	pb208_par_2.energy_CMS = E2;
+	struct ion_params pb208_par2;
+	pb208_par2.atomic_num = 82;
+	pb208_par2.mass_num = 208;
+	pb208_par2.energy_CMS = E2;
 
-	struct ion_params pb208_par_3;
-	pb208_par_3.atomic_num = 82;
-	pb208_par_3.mass_num = 208;
-	pb208_par_3.energy_CMS = E3;
+	struct ion_params pb208_par3;
+	pb208_par3.atomic_num = 82;
+	pb208_par3.mass_num = 208;
+	pb208_par3.energy_CMS = E3;
 
 	const double LOWER_F = 1e-6;
 	const double UPPER_F = 10e9;
@@ -251,9 +278,9 @@ void output_n_energy(const char FNAME[50])
 
 	for(int i = 0; i <= NUM_PONTOS; i++){
 		dados_out << freq << "\t"
-			<< epa_photon_flux(freq, &pb208_par_1) << "\t"
-			<< epa_photon_flux(freq, &pb208_par_2) << "\t"
-			<< epa_photon_flux(freq, &pb208_par_3) << "\n";
+			<< epa_photon_flux(freq, &pb208_par1) << "\t"
+			<< epa_photon_flux(freq, &pb208_par2) << "\t"
+			<< epa_photon_flux(freq, &pb208_par3) << "\n";
 		freq = freq + step;
 	}
 
@@ -261,19 +288,82 @@ void output_n_energy(const char FNAME[50])
 	dados_out.close();
 }
 
-
-int main(int argc, char *argv[])
+void output_charge_distribution(const char FNAME[50])
 {
-	std::cout << "Iniciando cálculo dos pontos.\n";
+	struct wood_saxon_par pb208_par;
+	pb208_par.mass_num = 208;
+	pb208_par.atomic_num = 82;
 
-	output_N1_and_N2("data/N1_map.dat", "data/N2_map.dat");
-	output_ratio("data/ratio.dat");
-	output_n_ions("data/n_total.dat");
+	struct wood_saxon_par au179_par;
+	au179_par.mass_num = 179;
+	au179_par.atomic_num = 79;
 
-	output_n_energy("data/n_total_energy.dat");
+	const double LOWER_RADIUS = 0.0;
+	const double UPPER_RADIUS = 10e-15 * METRE_TO_EV; // 100 fm
+	const int NUM_PONTOS = 100;
 
-	std::cout << "\nCálculo concluído\n\n";
+	double radius = LOWER_RADIUS;
+	double step = fabs(UPPER_RADIUS - LOWER_RADIUS) / (double) NUM_PONTOS;
 
-	return 0;
+	std::ofstream dados_out(FNAME);
+	assert(dados_out.is_open());
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	std::cout << "\n------------------------------------------------------\n";
+	std::cout << " * Plotagem da curva de distribuição de wood-saxon:\n"
+		<< "\t- LOWER_RADIUS = " << LOWER_RADIUS * 1e15 << " [fm]\n"
+		<< "\t- UPPER_RADIUS = " << UPPER_RADIUS * 1e15 / METRE_TO_EV << " [fm]\n"
+		<< "\t- NUM_PONTOS = " << NUM_PONTOS << "\n";
+
+	for(int i = 0; i <= NUM_PONTOS; i++) {
+		dados_out << radius * 1e15 / METRE_TO_EV << "\t" 
+			<< wood_saxon_distribution(radius, &pb208_par) / pow(METRE_TO_EV, 3) << "\t"
+			<< wood_saxon_distribution(radius, &au179_par) / pow(METRE_TO_EV, 3) << "\n";
+		radius += step;
+	}
+
+	std::cout << "\tDados salvos no arquivo \'" << FNAME << "\'\n";
+
+	dados_out.close();
 }
 
+void output_form_factor(const char FNAME[50])
+{
+	struct wood_saxon_par pb208_par;
+	pb208_par.mass_num = 208;
+	pb208_par.atomic_num = 82;
+
+	struct wood_saxon_par au179_par;
+	au179_par.mass_num = 179;
+	au179_par.atomic_num = 79;
+
+	const double LOWER_Q = 0.0;
+	const double UPPER_Q = 1e9;
+	const int NUM_PONTOS = 500;
+
+	double var_q = LOWER_Q;
+	double step = fabs(UPPER_Q - LOWER_Q) / (double) NUM_PONTOS;
+
+	std::ofstream dados_out(FNAME);
+	assert(dados_out.is_open());
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	std::cout << "\n------------------------------------------------------\n";
+	std::cout << "Plotagem do fator de forma:\n";
+	std::cout << "\tLOWER_Q = " << LOWER_Q << "\n";
+	std::cout << "\tUPPER_Q = " << UPPER_Q << "\n";
+	std::cout << "\tNUM_PONTOS = " << NUM_PONTOS << "\n";
+
+	for(int i = 0; i <= NUM_PONTOS; i++) {
+		dados_out << var_q*1e-9 << "\t"
+			<< abs(form_factor_wood_saxon(var_q, &pb208_par)) << "\n";
+		var_q += step;
+	}
+
+	std::cout << "\tDados salvos no arquivo \'" << FNAME << "\'\n";
+	dados_out.close();
+}

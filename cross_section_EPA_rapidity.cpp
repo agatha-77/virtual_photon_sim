@@ -66,11 +66,14 @@ void output_to_rapidity(const char FNAME[50], double lepton_mass)
 
 	for(int i = 0; i < NPONTOS; i++){
 		dados_out << var_Y
-			<< "\t" << dilepton_DCS_rapidity_EPA(var_Y, &params1, &err1)*1e12*EV_TO_BARN
+			<< "\t" << dilepton_DCS_rapidity_EPA(var_Y, &params1,
+					&err1)*1e12*EV_TO_BARN
 			<< "\t" << err1
-			<< "\t" << dilepton_DCS_rapidity_EPA(var_Y, &params2, &err2)*1e12*EV_TO_BARN
+			<< "\t" << dilepton_DCS_rapidity_EPA(var_Y, &params2,
+					&err2)*1e12*EV_TO_BARN
 			<< "\t" << err2
-		   	<< "\t" << dilepton_DCS_rapidity_EPA(var_Y, &params3, &err3)*1e12*EV_TO_BARN
+			<< "\t" << dilepton_DCS_rapidity_EPA(var_Y, &params3,
+					&err3)*1e12*EV_TO_BARN
 			<< "\t" << err2
 			<< "\n";
 
