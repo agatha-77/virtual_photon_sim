@@ -23,22 +23,29 @@ void output_freq_EPA_energy(const char FNAME[50]);
 
 void output_charge_distribution(const char FNAME[50]);
 void output_form_factor(const char FNAME[50]);
+void output_photon_fluxes(const char FNAME[50]);
+void output_total_photon_fluxes(const char FNAME[50]);
 
 
 int main(int argc, char *argv[])
 {
+	std::cout << "------------------------------------\n";
 	std::cout << "Iniciando cálculo dos pontos.\n";
 
 //	outputN_EPA("data/N1_map.dat", "data/N2_map.dat");
 //	output_ratio_EPA("data/ratio.dat");
 
-	output_freq_EPA_ions("data/n_total.dat");
-	output_freq_EPA_energy("data/n_total_energy.dat");
+//	output_freq_EPA_ions("data/n_total.dat");
+//	output_freq_EPA_energy("data/n_total_energy.dat");
 
-	output_charge_distribution("data/wood_saxon_dist.dat");
-	output_form_factor("data/form_factor.dat");
+//	output_charge_distribution("data/wood_saxon_dist.dat");
+//	output_form_factor("data/form_factor.dat");
+
+//	output_photon_fluxes("data/photon_flux1.dat");
+	output_total_photon_fluxes("data/photon_flux2.dat");
 
 	std::cout << "\nCálculo concluído.\n";
+	std::cout << "------------------------------------\n";
 
 	return 0;
 }
@@ -86,7 +93,8 @@ void outputN_EPA(const char FNAME_N1[50], const char FNAME_N2[50])
 	std::cout << "\tIntervalo de parâmetro de impacto:";
 	std::cout << LOWER_B / GSL_CONST_NUM_FEMTO << " fm e "
 		<< UPPER_B / GSL_CONST_NUM_FEMTO << " fm\n"; 
-	std::cout << "\tIntervalo de frequência: " << LOWER_F / GSL_CONST_NUM_MEGA << " GeV e "
+	std::cout << "\tIntervalo de frequência: "
+		<< LOWER_F / GSL_CONST_NUM_MEGA << " GeV e "
 		<< UPPER_F / GSL_CONST_NUM_MEGA << " GeV\n";
 	std::cout << "\tNúmero de pontos = " << NUM_PONTOS*NUM_PONTOS << "\n";
 
@@ -174,9 +182,9 @@ void output_freq_EPA_ions(const char FNAME[50])
 
 	// Intervalos de frequencia em eletron-Volt
 	const double LOWER_F = 1e-6;
-	const double UPPER_F = 10e9;
+	const double UPPER_F = 100e6;
 
-	const double CENTER_OF_MASS_ENERGY = 5.02e12;
+	const double CENTER_OF_MASS_ENERGY = 5.0e12;
 
 	struct ion_params gold179_params;
 	gold179_params.atomic_num = 79;
@@ -232,8 +240,7 @@ void output_freq_EPA_ions(const char FNAME[50])
 	for(int i = 0; i <= NUM_PONTOS; i++){
 		dados_out << freq << "\t"
 			<< epa_photon_flux(freq, &gold179_params) << "\t"
-			<< epa_photon_flux(freq, &pb208_params) << "\t"
-			<< electron_photon_flux(freq, &e_params) << "\n";
+			<< epa_photon_flux(freq, &pb208_params) << "\n";
 		freq = freq + step;
 	}
 
@@ -290,11 +297,11 @@ void output_freq_EPA_energy(const char FNAME[50])
 
 void output_charge_distribution(const char FNAME[50])
 {
-	struct wood_saxon_par pb208_par;
+	struct form_factor_par pb208_par;
 	pb208_par.mass_num = 208;
 	pb208_par.atomic_num = 82;
 
-	struct wood_saxon_par au179_par;
+	struct form_factor_par au179_par;
 	au179_par.mass_num = 179;
 	au179_par.atomic_num = 79;
 
@@ -331,14 +338,6 @@ void output_charge_distribution(const char FNAME[50])
 
 void output_form_factor(const char FNAME[50])
 {
-	struct wood_saxon_par pb208_par;
-	pb208_par.mass_num = 208;
-	pb208_par.atomic_num = 82;
-
-	struct wood_saxon_par au179_par;
-	au179_par.mass_num = 179;
-	au179_par.atomic_num = 79;
-
 	const double LOWER_Q = 0.0;
 	const double UPPER_Q = 1e9;
 	const int NUM_PONTOS = 500;
@@ -358,12 +357,154 @@ void output_form_factor(const char FNAME[50])
 	std::cout << "\tUPPER_Q = " << UPPER_Q << "\n";
 	std::cout << "\tNUM_PONTOS = " << NUM_PONTOS << "\n";
 
+	struct form_factor_par pb208_par;
+	pb208_par.mass_num = 208;
+	pb208_par.atomic_num = 82;
+
+	struct form_factor_par au179_par;
+	au179_par.mass_num = 179;
+	au179_par.atomic_num = 79;
+
+	double dummy = 0.0;
+
 	for(int i = 0; i <= NUM_PONTOS; i++) {
 		dados_out << var_q*1e-9 << "\t"
-			<< abs(form_factor_wood_saxon(var_q, &pb208_par)) << "\n";
+			<< abs(form_factor_wood_saxon(var_q, &pb208_par)) << "\t" 
+			<< abs(form_factor_monopole(var_q, &dummy)) << "\n";
 		var_q += step;
 	}
 
 	std::cout << "\tDados salvos no arquivo \'" << FNAME << "\'\n";
+	dados_out.close();
+}
+
+
+void output_photon_fluxes(const char FNAME[50])
+{
+	std::ofstream dados_out(FNAME);
+	assert(dados_out.is_open());
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	struct flux_parameter pb208_par_wood;
+	pb208_par_wood.mass_num = 208;
+	pb208_par_wood.atomic_num = 82;
+	pb208_par_wood.beam_energy = 5e12;
+	pb208_par_wood.form_factor_ptr = &form_factor_wood_saxon;
+
+	struct flux_parameter pb208_par_monopole;
+	pb208_par_monopole.mass_num = 208;
+	pb208_par_monopole.atomic_num = 82;
+	pb208_par_monopole.beam_energy = 5e12;
+	pb208_par_monopole.form_factor_ptr = &form_factor_monopole;
+
+	const double IMPACT_PAR0 = 0.1e-15 * METRE_TO_EV;
+	const double IMPACT_PARF = 100.0e-15 * METRE_TO_EV;
+	const double FREQ_0 = 1e-6;
+	const double FREQ_F = 1e6;
+	const int NUM_PONTOS = 50;
+
+	double var_b = IMPACT_PAR0;
+	double var_freq = FREQ_0;
+	double step_b = fabs(IMPACT_PARF - IMPACT_PAR0) / (double) NUM_PONTOS;
+	double step_freq = fabs(FREQ_F - FREQ_0) / (double) NUM_PONTOS;
+
+	std::cout << "\n########################################\n"
+		<< "\t * IMPACT_PAR0 = " << IMPACT_PAR0 << "\n"
+		<< "\t * IMPACT_PARF = " << IMPACT_PARF << "\n"
+		<< "\t * var_b = " << var_b << "\n"
+		<< "\t * var_freq = " << var_freq << "\n" 
+		<< "\t * step = " << step_b << "\n";
+	
+	for(int i = 0; i <= NUM_PONTOS; i++) {
+		var_freq = FREQ_0;
+
+		for(int j = 0; j <= NUM_PONTOS; j++){
+			dados_out << var_b * 1e15 / METRE_TO_EV << "\t"
+				<< var_freq * 1e-6 << "\t"
+				<< extended_photon_flux(var_freq, var_b, &pb208_par_wood)
+				<< "\t"
+				<< extended_photon_flux(var_freq, var_b, &pb208_par_monopole)
+				<< "\n";
+			var_freq += step_freq;
+		}
+		var_b += step_b;
+		dados_out << "\n";
+	}
+
+	dados_out.close();
+}
+
+void output_total_photon_fluxes(const char FNAME[50])
+{
+	const double ENERGY = 5e12;
+
+	const double FREQ_0 = 1e-6;
+	const double FREQ_F = 10e6;
+	const int NPONTOS = 50;
+
+	struct flux_parameter pb208_par_wood;
+	pb208_par_wood.mass_num = 208;
+	pb208_par_wood.atomic_num = 82;
+	pb208_par_wood.beam_energy = ENERGY;
+	pb208_par_wood.form_factor_ptr = &form_factor_wood_saxon;
+	pb208_par_wood.npontos = NPONTOS;
+	pb208_par_wood.freq_0 = FREQ_0;
+	pb208_par_wood.freq_f = FREQ_F;
+
+	struct flux_parameter pb208_par_monopole;
+	pb208_par_monopole.mass_num = 208;
+	pb208_par_monopole.atomic_num = 82;
+	pb208_par_monopole.beam_energy = ENERGY;
+	pb208_par_monopole.form_factor_ptr = &form_factor_monopole;
+	pb208_par_monopole.npontos = NPONTOS;
+	pb208_par_monopole.freq_0 = FREQ_0;
+	pb208_par_monopole.freq_f = FREQ_F;
+
+	double* var_freq = new double [NPONTOS];
+	double* result_wood_saxon = new double [NPONTOS];
+	double* result_monopole = new double [NPONTOS];
+	double* err_wood_saxon = new double [NPONTOS];
+	double* err_monopole = new double [NPONTOS];
+
+	std::cout << "\n########################################\n"
+		<< "\tCalculo do fluxo total\n"
+		<< "\tFREQ_0 = " << FREQ_0 << "\n"
+		<< "\tFREQ_F = " << FREQ_F << "\n"
+		<< "\tENERGY = " << ENERGY << "\n";
+
+	calc_extended_total_photon_flux(
+			var_freq,
+			result_wood_saxon,
+			err_wood_saxon,
+			&pb208_par_wood);
+
+	calc_extended_total_photon_flux(
+			var_freq,
+			result_monopole,
+			err_monopole,
+			&pb208_par_monopole);
+
+	std::ofstream dados_out(FNAME);
+	assert(dados_out.is_open());
+	dados_out.setf(std::ios::scientific);
+	dados_out.setf(std::ios::showpos);
+	dados_out.precision(13);
+
+	for(int i = 0; i <= NPONTOS; i++)
+	{
+		dados_out << var_freq[i] * 1e-6 << "\t"
+			<< result_wood_saxon[i] << "\t"
+			<< result_monopole[i] << "\t"
+			<< err_wood_saxon[i] << "\t"
+			<< err_monopole[i] << "\n";
+	}
+
+	delete[] var_freq;
+	delete[] result_wood_saxon;
+	delete[] result_monopole;
+	delete[] err_wood_saxon;
+	delete[] err_monopole;
 	dados_out.close();
 }

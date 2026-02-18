@@ -55,14 +55,14 @@ void output_to_rapidity(const char FNAME[50], double lepton_mass)
 
 	std::cout
 		<< "Calculando secao de choque diferencial a rapidez para fluxo de chumbo.\n";
-	std::cout << "-> massa_lepton = " << lepton_mass << "\n";
-	std::cout << "-> massa chumbo = " << PB_MASS << "\n";
-	std::cout << "-> gamma1 = " << E1 / PB_MASS << "\n";
-	std::cout << "-> beta1 = " << sqrt(1 - PB_MASS*PB_MASS/(E1*E1)) << "\n";
-	std::cout << "-> gamma2 = " << E2 / PB_MASS << "\n";
-	std::cout << "-> beta2 = " << sqrt(1 - PB_MASS*PB_MASS/(E2*E2)) << "\n";
-	std::cout << "-> gamma3 = " << E3 / PB_MASS << "\n";
-	std::cout << "-> beta3 = " << sqrt(1 - PB_MASS*PB_MASS/(E3*E3)) << "\n\n";
+	std::cout << "\t-> massa_lepton = " << lepton_mass << "\n";
+	std::cout << "\t-> massa chumbo = " << PB_MASS << "\n";
+	std::cout << "\t-> gamma1 = " << E1 / PB_MASS << "\n";
+	std::cout << "\t-> beta1 = " << sqrt(1 - PB_MASS*PB_MASS/(E1*E1)) << "\n";
+	std::cout << "\t-> gamma2 = " << E2 / PB_MASS << "\n";
+	std::cout << "\t-> beta2 = " << sqrt(1 - PB_MASS*PB_MASS/(E2*E2)) << "\n";
+	std::cout << "\t-> gamma3 = " << E3 / PB_MASS << "\n";
+	std::cout << "\t-> beta3 = " << sqrt(1 - PB_MASS*PB_MASS/(E3*E3)) << "\n\n";
 
 	for(int i = 0; i < NPONTOS; i++){
 		dados_out << var_Y

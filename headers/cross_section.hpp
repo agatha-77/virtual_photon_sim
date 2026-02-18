@@ -243,7 +243,9 @@ double dilepton_TCS_EPA(double beam_energy, double lepton_mass,
 }
 
 /* 
+ * *********************************************************************
  * Seções de choque diferenciais à rapidez
+ * *********************************************************************
  */
 
 // Integrando da função abaixo
