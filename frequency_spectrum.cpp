@@ -32,17 +32,17 @@ int main(int argc, char *argv[])
 	std::cout << "------------------------------------\n";
 	std::cout << "Iniciando cálculo dos pontos.\n";
 
-//	outputN_EPA("data/N1_map.dat", "data/N2_map.dat");
+	outputN_EPA("data/N1_map.dat", "data/N2_map.dat");
 //	output_ratio_EPA("data/ratio.dat");
 
-//	output_freq_EPA_ions("data/n_total.dat");
-//	output_freq_EPA_energy("data/n_total_energy.dat");
+	output_freq_EPA_ions("data/n_total.dat");
+	output_freq_EPA_energy("data/n_total_energy.dat");
 
 //	output_charge_distribution("data/wood_saxon_dist.dat");
 //	output_form_factor("data/form_factor.dat");
 
-//	output_photon_fluxes("data/photon_flux1.dat");
-	output_total_photon_fluxes("data/photon_flux2.dat");
+	output_photon_fluxes("data/photon_flux1.dat");
+//	output_total_photon_fluxes("data/photon_flux2.dat");
 
 	std::cout << "\nCálculo concluído.\n";
 	std::cout << "------------------------------------\n";
@@ -68,7 +68,7 @@ void outputN_EPA(const char FNAME_N1[50], const char FNAME_N2[50])
 	long double step_par = (UPPER_B - LOWER_B)/NUM_PONTOS;
 	long double step_freq = (UPPER_F - LOWER_F)/NUM_PONTOS;
 
-	const double CENTRE_OF_MASS_ENERGY = 500 * GSL_CONST_NUM_GIGA;
+	const double CENTRE_OF_MASS_ENERGY = 5e12; // 5 TeV
 
 	struct ion_params pb208_params;
 	pb208_params.atomic_num = 82;
@@ -178,11 +178,11 @@ void output_ratio_EPA(const char FNAME[50])
 // impacto
 void output_freq_EPA_ions(const char FNAME[50])
 {
-	const int NUM_PONTOS = 6000;
+	const int NUM_PONTOS = 10000;
 
 	// Intervalos de frequencia em eletron-Volt
 	const double LOWER_F = 1e-6;
-	const double UPPER_F = 100e6;
+	const double UPPER_F = 1e9;
 
 	const double CENTER_OF_MASS_ENERGY = 5.0e12;
 
@@ -271,7 +271,7 @@ void output_freq_EPA_energy(const char FNAME[50])
 	pb208_par3.energy_CMS = E3;
 
 	const double LOWER_F = 1e-6;
-	const double UPPER_F = 10e9;
+	const double UPPER_F = 1e9;
 	const int NUM_PONTOS = 6000;
 
 	double freq = LOWER_F;
@@ -381,57 +381,112 @@ void output_form_factor(const char FNAME[50])
 
 void output_photon_fluxes(const char FNAME[50])
 {
+	const double IMPACT_PAR0 = 0.1e-15 * METRE_TO_EV;
+	const double IMPACT_PARF = 100.0e-15 * METRE_TO_EV;
+	const double FREQ1 = 10e6;
+	const double FREQ2 = 100e6;
+	const double E_BEAM = 5e12;
+	//const double FREQ3 = 1e9;
+	const int NPONTOS = 60;
+	const int INTEGRATION_SIZE_WOOD = 10000000;
+	const int INTEGRATION_SIZE_MONOPOLE = 100000;
+
+	struct flux_parameter pb208_par_wood;
+	pb208_par_wood.mass_num = 208;
+	pb208_par_wood.atomic_num = 82;
+	pb208_par_wood.beam_energy = E_BEAM;
+	pb208_par_wood.b_0 = IMPACT_PAR0;
+	pb208_par_wood.b_f = IMPACT_PARF;
+	pb208_par_wood.npontos = NPONTOS;
+	pb208_par_wood.integration_size = INTEGRATION_SIZE_WOOD;
+	pb208_par_wood.form_factor_ptr = &form_factor_wood_saxon;
+
+	struct flux_parameter pb208_par_monopole;
+	pb208_par_monopole.mass_num = 208;
+	pb208_par_monopole.atomic_num = 82;
+	pb208_par_monopole.beam_energy = E_BEAM;
+	pb208_par_monopole.b_0 = IMPACT_PAR0;
+	pb208_par_monopole.b_f = IMPACT_PARF;
+	pb208_par_monopole.npontos = NPONTOS;
+	pb208_par_monopole.integration_size = INTEGRATION_SIZE_MONOPOLE;
+	pb208_par_monopole.form_factor_ptr = &form_factor_monopole;
+
+
+	std::cout << "\n--------------------------------------------------\n"
+		<< "Calculando o N(omega, b) com os parâmetros abaixo:\n"
+		<< "\t * IMPACT_PAR0 = " << IMPACT_PAR0 << "\n"
+		<< "\t * IMPACT_PARF = " << IMPACT_PARF << "\n"
+		<< "\t * FREQ1 = " << FREQ1 << "\n"
+		<< "\t * FREQ2 = " << FREQ2 << "\n"
+		<< "\t * NPONTOS = " << NPONTOS << "\n";
+
+	double* var_b = new double [NPONTOS];
+
+	double* result_wood_saxon1 = new double [NPONTOS];
+	double* result_monopole1 = new double [NPONTOS];
+	double* result_wood_saxon2 = new double [NPONTOS];
+	double* result_monopole2 = new double [NPONTOS];
+
+	double* error_wood_saxon1 = new double [NPONTOS];
+	double* error_monopole1 = new double [NPONTOS];
+	double* error_wood_saxon2 = new double [NPONTOS];
+	double* error_monopole2 = new double [NPONTOS];
+
+	/* Chama as rotinas para cálculo dos pontos */
+	std::cout << "\n##################################################\n";
+	std::cout << "\tCalculando wood_saxon\n";
+	std::cout << "##################################################\n";
+	calc_extended_photon_fluxes(var_b,
+			result_wood_saxon1,
+			error_wood_saxon1,
+			FREQ1,
+			&pb208_par_wood);
+	calc_extended_photon_fluxes(var_b,
+			result_wood_saxon2,
+			error_wood_saxon2,
+			FREQ2,
+			&pb208_par_wood);
+
+	std::cout << "\n##################################################\n";
+	std::cout << "\tCalculando monopolo\n";
+	std::cout << "##################################################\n";
+	calc_extended_photon_fluxes(var_b,
+			result_monopole1,
+			error_monopole1,
+			FREQ1,
+			&pb208_par_monopole);
+	calc_extended_photon_fluxes(var_b,
+			result_monopole2,
+			error_monopole2,
+			FREQ2,
+			&pb208_par_monopole);
+
 	std::ofstream dados_out(FNAME);
 	assert(dados_out.is_open());
 	dados_out.setf(std::ios::scientific);
 	dados_out.setf(std::ios::showpos);
 	dados_out.precision(13);
 
-	struct flux_parameter pb208_par_wood;
-	pb208_par_wood.mass_num = 208;
-	pb208_par_wood.atomic_num = 82;
-	pb208_par_wood.beam_energy = 5e12;
-	pb208_par_wood.form_factor_ptr = &form_factor_wood_saxon;
-
-	struct flux_parameter pb208_par_monopole;
-	pb208_par_monopole.mass_num = 208;
-	pb208_par_monopole.atomic_num = 82;
-	pb208_par_monopole.beam_energy = 5e12;
-	pb208_par_monopole.form_factor_ptr = &form_factor_monopole;
-
-	const double IMPACT_PAR0 = 0.1e-15 * METRE_TO_EV;
-	const double IMPACT_PARF = 100.0e-15 * METRE_TO_EV;
-	const double FREQ_0 = 1e-6;
-	const double FREQ_F = 1e6;
-	const int NUM_PONTOS = 50;
-
-	double var_b = IMPACT_PAR0;
-	double var_freq = FREQ_0;
-	double step_b = fabs(IMPACT_PARF - IMPACT_PAR0) / (double) NUM_PONTOS;
-	double step_freq = fabs(FREQ_F - FREQ_0) / (double) NUM_PONTOS;
-
-	std::cout << "\n########################################\n"
-		<< "\t * IMPACT_PAR0 = " << IMPACT_PAR0 << "\n"
-		<< "\t * IMPACT_PARF = " << IMPACT_PARF << "\n"
-		<< "\t * var_b = " << var_b << "\n"
-		<< "\t * var_freq = " << var_freq << "\n" 
-		<< "\t * step = " << step_b << "\n";
-	
-	for(int i = 0; i <= NUM_PONTOS; i++) {
-		var_freq = FREQ_0;
-
-		for(int j = 0; j <= NUM_PONTOS; j++){
-			dados_out << var_b * 1e15 / METRE_TO_EV << "\t"
-				<< var_freq * 1e-6 << "\t"
-				<< extended_photon_flux(var_freq, var_b, &pb208_par_wood)
-				<< "\t"
-				<< extended_photon_flux(var_freq, var_b, &pb208_par_monopole)
-				<< "\n";
-			var_freq += step_freq;
-		}
-		var_b += step_b;
-		dados_out << "\n";
+	for(int i = 0; i <= NPONTOS; i++)
+	{
+		dados_out << var_b[i] * 1e15 / METRE_TO_EV
+			<< "\t" << result_wood_saxon1[i]
+			<< "\t" << result_monopole1[i]
+			<< "\t" << result_wood_saxon2[i]
+			<< "\t" << result_monopole2[i] << "\n";
 	}
+	
+	delete[] var_b;
+	
+	delete[] result_wood_saxon1;
+	delete[] result_wood_saxon2;
+	delete[] result_monopole1;
+	delete[] result_monopole2;
+
+	delete[] error_wood_saxon1;
+	delete[] error_wood_saxon2;
+	delete[] error_monopole1;
+	delete[] error_monopole2;
 
 	dados_out.close();
 }
@@ -439,12 +494,11 @@ void output_photon_fluxes(const char FNAME[50])
 void output_total_photon_fluxes(const char FNAME[50])
 {
 	const double ENERGY = 5e12;
+	const double FREQ_0 = 0.001e6;
+	const double FREQ_F = 100e6;
+	const int NPONTOS = 60;
 
-	const double FREQ_0 = 1e-6;
-	const double FREQ_F = 10e6;
-	const int NPONTOS = 50;
-
-	struct flux_parameter pb208_par_wood;
+	struct flux_total_parameter pb208_par_wood;
 	pb208_par_wood.mass_num = 208;
 	pb208_par_wood.atomic_num = 82;
 	pb208_par_wood.beam_energy = ENERGY;
@@ -452,8 +506,10 @@ void output_total_photon_fluxes(const char FNAME[50])
 	pb208_par_wood.npontos = NPONTOS;
 	pb208_par_wood.freq_0 = FREQ_0;
 	pb208_par_wood.freq_f = FREQ_F;
+	pb208_par_wood.init_call = 100000;
+	pb208_par_wood.routine_call = 500000;
 
-	struct flux_parameter pb208_par_monopole;
+	struct flux_total_parameter pb208_par_monopole;
 	pb208_par_monopole.mass_num = 208;
 	pb208_par_monopole.atomic_num = 82;
 	pb208_par_monopole.beam_energy = ENERGY;
@@ -461,6 +517,8 @@ void output_total_photon_fluxes(const char FNAME[50])
 	pb208_par_monopole.npontos = NPONTOS;
 	pb208_par_monopole.freq_0 = FREQ_0;
 	pb208_par_monopole.freq_f = FREQ_F;
+	pb208_par_monopole.init_call = 100000;
+	pb208_par_monopole.routine_call = 500000;
 
 	double* var_freq = new double [NPONTOS];
 	double* result_wood_saxon = new double [NPONTOS];
@@ -468,23 +526,18 @@ void output_total_photon_fluxes(const char FNAME[50])
 	double* err_wood_saxon = new double [NPONTOS];
 	double* err_monopole = new double [NPONTOS];
 
-	std::cout << "\n########################################\n"
-		<< "\tCalculo do fluxo total\n"
-		<< "\tFREQ_0 = " << FREQ_0 << "\n"
-		<< "\tFREQ_F = " << FREQ_F << "\n"
-		<< "\tENERGY = " << ENERGY << "\n";
+	std::cout << "\n------------------------------------------------------------\n"
+		<< "\tCalculo do fluxo total com dsitribuição de carga extendida\n"
+		<< "\t-> FREQ_0 = " << FREQ_0 << "\n"
+		<< "\t-> FREQ_F = " << FREQ_F << "\n"
+		<< "\t-> ENERGY = " << ENERGY << "\n";
 
-	calc_extended_total_photon_flux(
-			var_freq,
+	calc_extended_total_photon_flux(var_freq,
 			result_wood_saxon,
-			err_wood_saxon,
-			&pb208_par_wood);
-
-	calc_extended_total_photon_flux(
-			var_freq,
+			err_wood_saxon, &pb208_par_wood);
+	calc_extended_total_photon_flux(var_freq,
 			result_monopole,
-			err_monopole,
-			&pb208_par_monopole);
+			err_monopole, &pb208_par_monopole);
 
 	std::ofstream dados_out(FNAME);
 	assert(dados_out.is_open());

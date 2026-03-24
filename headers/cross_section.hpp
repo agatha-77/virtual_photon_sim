@@ -297,15 +297,15 @@ double dilepton_DCS_rapidity_EPA(double rapidity, void* params, double* err)
 
 	double max_photon_virt = 2.0*(gamma*beta / IMP_PAR_MIN);
 
-	struct integrand_params rap_params;
-	rap_params.beam_energy = beam_energy;
-	rap_params.var1 = rapidity;
-	rap_params.produced_mass = 2.0*lepton_mass;
-	rap_params.flux_ptr = cast_params->flux_ptr;
+	struct integrand_params rapidity_params;
+	rapidity_params.beam_energy = beam_energy;
+	rapidity_params.var1 = rapidity;
+	rapidity_params.produced_mass = 2.0*lepton_mass;
+	rapidity_params.flux_ptr = cast_params->flux_ptr;
 	
 	gsl_function integr_func;
 	integr_func.function = &dilepton_DCS_rapidity_integrand_EPA;
-	integr_func.params = &rap_params;
+	integr_func.params = &rapidity_params;
 
 	gsl_integration_qags(&integr_func,
 			2*lepton_mass, beam_energy,

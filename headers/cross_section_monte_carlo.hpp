@@ -1,9 +1,13 @@
 /*
- * Biblioteca para calculo das secoes de choque usando
- * integracao de monte carlo.
+ * *************************************************************************
+ * Biblioteca para calculo das secoes de choque usando integração de monte
+ * carlo.
+ * *************************************************************************
  * 
- * Segue a mesma estrutura da outra biblioteca.
  */
+
+#ifndef CROSS_SECTION_MONTE_CARLO
+#define CROSS_SECTION_MONTE_CARLO
 
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_monte.h>
@@ -13,116 +17,68 @@
 
 #include "phys_const.hpp"
 #include "point_like_charge.hpp"
+#include "extended_photon_fluxes.hpp"
 
-struct dilepton_params
+struct cross_integrand_params
 {
-	double beam_energy;
-	double lepton_mass;
+	double ion_energy;
+	double xi;
+	double (*form_factor_ptr) (double q, void* params); /* Vai mais coisas aqui acho. */
 };
 
-double fundamental_CS_dilepton(double arg, double mass, void* params)
-{
-	long double w = arg;
 
-	return (4.0*PI * FINE_STRUCT_CONST*FINE_STRUCT_CONST / (w*w))
-		* (2.0* log( (w / (2*mass)) * 
-		(1.0 + sqrt(1.0 - ( (4*mass*mass) / (w*w))) ))
-		* (1.0 + (4.0*mass*mass*w*w - 8.0*mass*mass*mass*mass)/(w*w*w*w) ) 
-		- sqrt(1.0 - (4.0*mass*mass) /(w*w) ) * (1.0 + (4.0*mass*mass)/(w*w)) );
+double cross_section_integrand(double* arg, void* params)
+{
+	// ... TODO
+	// escrever o integrando com bases nas notas
 }
 
-
-double integrand_EPA_dilepton(double* var, size_t dim, void* params)
+/* Struct para a função abaixo */
+struct cross_params
 {
-	struct dilepton_params* cast_params = (struct dilepton_params*) params;
-	double cms_energy = cast_params->beam_energy;
-	double mass = cast_params->lepton_mass;
-	double dummy = 0.0;
+	double ion_energy;
+	double lepton_produced_mass;
+	double (*form_factor_ptr) (double q, void* params); /* Ponteiro para o fator de forma */
+	int atomic_num;
+	int mass_num;
+	int initial_calls;
+	int routine_calls;
+	int npontos;
+};
 
-	double var1 = var[0];
-	double var2 = var[1];
 
-	struct ion_params gold179_params;
-	gold179_params.atomic_num = 79;
-	gold179_params.mass_num = 179;
-	gold179_params.energy_CMS = cms_energy;
+/* 
+ * Função de integração para a integral de seção de choque total com densidade
+ * de carga do íon incidente extendida
+ */
+void calc_cross_section_to_energy(double* energy, double* result, void* params)
+{
+	struct cross_params* cast_params = (struct cross_params*) params;
+	double ion_mass = cast_params->atomic_num * PROTON_MASS + 
+		(cast_params->mass_num - cast_params->atomic_num)*NEUTRON_MASS;
 
-	struct ion_params pb208_params;
-	pb208_params.atomic_num = 82;
-	pb208_params.mass_num = 208;
-	pb208_params.energy_CMS = cms_energy;
+	double gamma = cast_params->ion_energy / cast_params->ion_mass;
+	double beta = sqrt(1.0 - 1.0 / (gamma*gamma));
+	double nuclear_radius = 1.21e-15 * pow(atomic_num, 3) * METRE_TO_EV;
 
-	return (epa_photon_flux(var1*cms_energy, &pb208_params)/var1) * 
-		(epa_photon_flux(var2*cms_energy, &pb208_params)/var2) *
-		fundamental_CS_dilepton(sqrt(4*var1*var2*cms_energy*cms_energy), mass, &dummy);
+	const int DIMENSION = 8;
+	const double UPPER_BOUND = 800.0;
+
+	double x0[DIMENSION] = {
+		cast_params->lepton_produced_mass, 0.0,
+		2*nuclear_radius, 2*nuclear_radius,
+		0.0, 0.0,
+		0.0, 0.0
+	};
+
+	double xf[DIMENSION] = {
+		cast_params->ion_energy, cast_params->ion_energy,
+		UPPER_BOUND, UPPER_BOUND,
+		UPPER_BOUND, UPPER_BOUND,
+		UPPER_BOUND, UPPER_BOUND
+	};
+
+
 }
 
-
-double integral_monte_vegas( double (*fptr) (double* arg, size_t dim, void* params),
-		double* x_i, double* x_f, const size_t DIMENSION, double* err, void* params)
-{
-	double res;
-	size_t calls = 1000;
-
-	const gsl_rng_type* T;
-	gsl_rng* r;
-
-	gsl_monte_function INTEGR_FUNCTION = {fptr, DIMENSION, params};
-
-	gsl_rng_env_setup();
-
-	T = gsl_rng_default;
-	r = gsl_rng_alloc(T);
-
-	gsl_monte_vegas_state* s = gsl_monte_vegas_alloc(DIMENSION);
-	gsl_monte_vegas_integrate(&INTEGR_FUNCTION,
-			x_i, x_f,
-			DIMENSION, calls,
-			r, s,
-			&res, err);
-
-	std::cout << "-----------------------------------------\n";
-	std::cout << "Calculando integral:\n";
-	std::cout << "resultado = " << res << "\nerro = " << *err << "\n";
-	std::cout << "-----------------------------------------\n";
-
-	do {
-		gsl_monte_vegas_integrate(&INTEGR_FUNCTION,
-				x_i, x_f,
-				DIMENSION, calls/5,
-				r, s,
-				&res, err);
-		//std::cout << res << "\t" << *err << "\n";
-
-	} while(fabs(gsl_monte_vegas_chisq(s) - 1.0) > 0.5);
-
-	gsl_monte_vegas_free(s);
-	gsl_rng_free(r);
-
-	return res;
-}
-
-double dilepton_TCS_EPA_monte_vegas(double beam_energy, double mass, double* err)
-{
-	double alpha = 0.0;
-	double result;
-	double x_i[2];
-	double x_f[2];
-
-	struct dilepton_params lepton_params;
-	lepton_params.beam_energy = beam_energy;
-	lepton_params.lepton_mass = mass;
-
-	gsl_set_error_handler_off();
-
-	x_i[0] = mass / beam_energy; x_f[0] = 1.0;
-	x_i[1] = mass*mass / (beam_energy*beam_energy * x_i[0]);
-	x_f[1] = 1.0;
-
-	result = integral_monte_vegas(&integrand_EPA_dilepton,
-			x_i, x_f, 
-			2, err, &lepton_params);
-
-	return result;
-
-}
+#endif

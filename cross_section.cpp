@@ -25,9 +25,6 @@ int main()
 	output_fundamental_muon_CS("data/fundamental_muon_CS.dat");
 	output_fundamental_electron_CS("data/fundamental_electron_CS.dat");
 	output_fundamental_tau_CS("data/fundamental_tau_CS.dat");
-	//output_total_electron_electron_CS("data/total_electron_electron_CS.dat");
-	//output_total_muon_electron_CS("data/total_muon_electron_CS.dat");
-	//output_total_tau_electron_CS("data/total_tau_electron_CS.dat");
 
 	return 0;
 }

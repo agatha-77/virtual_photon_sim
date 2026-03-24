@@ -40,7 +40,7 @@ struct ion_params
 };
 
 
-// N(w,b) do pulso paralelo P1
+// N(w,b) do pulso frontal P1
 double ep_num_par(double frequency, double imp_par, void* params)
 {
 	struct ion_params* cast_params = (struct ion_params*) params;
@@ -58,7 +58,7 @@ double ep_num_par(double frequency, double imp_par, void* params)
 }
 
 
-// N(w,b) do pulso perpendicular P2
+// N(w,b) do pulso transverso P2
 double ep_num_perp(double frequency, double imp_par, void* params)
 {
 	struct ion_params* cast_params = (struct ion_params*) params;
@@ -95,7 +95,7 @@ double epa_photon_flux(double frequency, void* params)
 
 	return frontal_mult * ( bessel_arg * K0(bessel_arg) * K1(bessel_arg) -
 			(beta*beta * bessel_arg*bessel_arg) * ( K1(bessel_arg)*K1(bessel_arg) -
-			K0(bessel_arg)*K0(bessel_arg) ) / 2.0);
+			K0(bessel_arg)*K0(bessel_arg) / (gamma*gamma) ) / 2.0);
 }
 
 #endif

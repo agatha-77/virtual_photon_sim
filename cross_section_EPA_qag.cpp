@@ -29,7 +29,7 @@ int main()
 	std::cout << "--------------------------------------------\n";
 	std::cout << "electron mass = " << ELECTRON_MASS << "\t";
 	std::cout << "muon mass = " << MUON_MASS << "\t";
-	std::cout << "tau mass = " << TAU_MASS << "\n\t\t";
+	std::cout << "tau mass = " << TAU_MASS << "\n\t";
 	/*
 	std::cout << ENERGY_BEAM1 << "\t" 
 		<< dilepton_TCS_EPA(ENERGY_BEAM1, ELECTRON_MASS, &epa_photon_flux, &err)
